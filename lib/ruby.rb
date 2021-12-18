@@ -17,6 +17,7 @@ module Nmspec
         code << _constructor
         code << ''
         code << _numeric_types
+        code << _str_types
         code << _list_types
 
         types = spec['types']
@@ -102,15 +103,13 @@ module Nmspec
         code
       end
 
-      # This includes str, and anything with '*_list' in the type name
-      def _list_types
+      def _str_types
         code = []
 
         code << '  ###########################################'
-        code << '  # list types'
+        code << '  # str types'
         code << '  ###########################################'
         code << ''
-
         code << "  def r_str"
         code << "    bytes = @socket.recv(2).unpack('S>')"
         code << "    str = @socket.recv(bytes)"
@@ -124,6 +123,18 @@ module Nmspec
         code << "    @socket.send([str.length].pack('S>'), 0)"
         code << "    @socket.send(str, 0)"
         code << '  end'
+        code << ''
+
+        code
+      end
+
+      # This includes str, and anything with '*_list' in the type name
+      def _list_types
+        code = []
+
+        code << '  ###########################################'
+        code << '  # list types'
+        code << '  ###########################################'
         code << ''
 
         ::Nmspec::V1::BASE_TYPES
@@ -196,9 +207,11 @@ module Nmspec
       def _protos_methods(protos)
         code = []
 
-        code << '  ###########################################'
-        code << '  # messages'
-        code << '  ###########################################'
+        if protos&.keys && protos&.keys&.length > 0
+          code << '  ###########################################'
+          code << '  # messages'
+          code << '  ###########################################'
+        end
 
         protos&.keys&.each_with_index do |proto_name, proto_code|
           # This figures out which identifiers mentioned in the msg
@@ -209,10 +222,10 @@ module Nmspec
           code << ''
           send_local_vars = []
           recv_local_vars = []
-          send_passed_params, recv_passed_params = protos[msg_name]['msgs']
-            .inject([Set.new, Set.new]) do |all_params, step|
+          send_passed_params, recv_passed_params = protos[proto_name]['msgs']
+            .inject([Set.new, Set.new]) do |all_params, msg|
               send_params, recv_params = all_params
-              mode, type, identifier = step.split
+              mode, type, identifier = msg.split
 
               case mode
               when 'r'
@@ -230,16 +243,16 @@ module Nmspec
 
           ##
           # send
-          code << _msg_method('send', msg_name, protos, send_local_vars, send_passed_params, msg_code)
+          code << _proto_method('send', proto_name, protos, send_local_vars, send_passed_params, proto_code)
           code << ''
-          code << _msg_method('recv', msg_name, protos, recv_local_vars, recv_passed_params, msg_code)
+          code << _proto_method('recv', proto_name, protos, recv_local_vars, recv_passed_params, proto_code)
         end
 
         code
       end
       ##
-      # Builds a single msg method
-      def _msg_method(kind, msg_name, protos, local_vars, passed_params, msg_code)
+      # Builds a single protocol method
+      def _proto_method(kind, proto_name, protos, local_vars, passed_params, proto_code)
         code = []
 
         code << "  # #{protos[proto_name]['desc']}" if protos[proto_name]['desc']
@@ -253,11 +266,11 @@ module Nmspec
 
         code << "  def #{kind}_#{proto_name}#{passed_params.length > 0 ? "(#{(passed_params.to_a).join(', ')})" : ''}"
 
-        steps = protos[proto_name]['steps']
+        msgs = protos[proto_name]['msgs']
         code << "    w_i8(#{proto_code})" if kind.eql?('send')
-        steps.each do |step|
-          step = kind.eql?('send') ? step : _flip_mode(step)
-          code << "    #{_line_from_step(step)}"
+        msgs.each do |msg|
+          msg = kind.eql?('send') ? msg : _flip_mode(msg)
+          code << "    #{_line_from_msg(msg)}"
         end
         code << "\n    [#{local_vars.map{|v| v.last }.uniq.join(', ')}]" unless local_vars.empty?
         code << "  end"
@@ -265,13 +278,13 @@ module Nmspec
         code
       end
 
-      def _flip_mode(step)
-        mode, type, identifier = step.split(' ')
+      def _flip_mode(msg)
+        mode, type, identifier = msg.split(' ')
         "#{mode == 'r' ? 'w' : 'r'} #{type} #{identifier}"
       end
 
-      def _line_from_step(step)
-        mode, type, identifier = step.split(' ')
+      def _line_from_msg(msg)
+        mode, type, identifier = msg.split(' ')
 
         case mode
         when 'r'
@@ -279,7 +292,7 @@ module Nmspec
         when 'w'
           "w_#{type}(#{identifier})"
         else
-          raise "Unsupported message step mode: `#{mode}`"
+          raise "Unsupported message msg mode: `#{mode}`"
         end
       end
     end

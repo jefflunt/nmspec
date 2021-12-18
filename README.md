@@ -1,7 +1,9 @@
 `nmspec` (short for 'network message specification') is a subset of YAML used to
-specify the format of messages between two sides of a network connection.
+specify the format of communication protocols between two sides of a network
+connection.
 
-This gem will support network messengers in these two languages:
+As a starting point this gem will support network messengers in these two
+languages:
 
 * [Ruby 3.0.x][ruby-lang]
 * [GDScript 3.4][gdscript]
@@ -12,7 +14,8 @@ language contributors to build their own gems to support their output languages.
 
 # Basic example
 
-* `demo/basic.nmspec` contains a minimal example of an `.nmspec` file.
+* `demo/minimal.nmspec` contains a minimal example of an `.nmspec` file.
+* `demo/base_types.nmspec` contains a messenger with a single protocol that
 * `demo/generals.io.nmspec` contains a theoretical implementation of the
 messaging required for a game of [generals.io][generals.io]
 
@@ -31,9 +34,9 @@ pp  Nmspec::V1.gen(
 
 ## Messenger
 
-A messenger is the thing you're descripting in an .nmspec file. A messenger has
-default support for reading and writing a number of numeric, string, and array
-types.
+A `messenger` is the thing you're descripting in an .nmspec file. A `messenger`
+has default support for reading and writing a number of numeric, string, and
+array types.
 
 ## Types
 
@@ -44,13 +47,13 @@ A `Messenger` has many types.
 
 ## Protocols
 
-A `protocol` is a list of messages that pass between two `Messenger` peers. A
+A `protocol` is a list of `messages` that pass between two `Messenger` peers. A
 `Messenger` has many protocols.
 
 ## Messages
 
 Messages are either read (`r`) or writes (`w`) of types over a network
-connection. Messages also define logical names for parameters and returned data.
+connection. `Messages` also define logical names for parameters and returned data.
 
 ```
 
@@ -61,7 +64,7 @@ not valid YAML, then it's definitely not valid `nmspec`.
 
 ## Required keys:
 
-A minimal messenger, with only a name and default types supported must include:
+A minimal `messenger`, with only a name and default types supported must include:
 
 * `version` - which currently must be set to `1`
 * `msgr` - the top-level key for naming and describing the messenger
