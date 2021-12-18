@@ -2,8 +2,8 @@
 [gdscript]: https://docs.godotengine.org/en/stable/getting_started/scripting/gdscript/gdscript_basics.html
 [generals.io]: https://generals.io/
 
-`nmspec`, short for 'network message specification', is a subset of YAML used
-to specify the format of communication protocols between two sides of a network
+`nmspec` (network message specification) is a subset of YAML used to specify
+the format of communication protocols between two sides of a network
 connection.
 
 As a starting point this gem will support network messengers in these two
