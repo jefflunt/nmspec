@@ -1,5 +1,5 @@
-`nmspec` (short for 'network message specification') is a subset of YAML used to
-specify the format of communication protocols between two sides of a network
+`nmspec`, short for 'network message specification', is a subset of YAML used
+to specify the format of communication protocols between two sides of a network
 connection.
 
 As a starting point this gem will support network messengers in these two
@@ -10,7 +10,8 @@ languages:
 
 Additional languages can be added if there is interest. If so, then I will move
 the Ruby and GDScript code generators to their own gems, and encourage other
-language contributors to build their own gems to support their output languages.
+language contributors to build their own gems to support their output
+languages.
 
 # Basic example
 
