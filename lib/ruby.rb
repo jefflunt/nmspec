@@ -7,12 +7,12 @@ module Nmspec
         code << '##'
         code << '# NOTE: this code is auto-generated from an nmspec file'
 
-        if spec['module']['desc']
+        if spec['msgr']['desc']
           code << '#'
-          code << "# #{spec['module']['desc']}"
+          code << "# #{spec['msgr']['desc']}"
         end
 
-        code << "class #{_class_name_from_mod(spec['module'])}"
+        code << "class #{_class_name_from_mod(spec['msgr'])}"
 
         code << _constructor
         code << ''
@@ -32,6 +32,7 @@ module Nmspec
         code.join("\n")
       rescue => e
         "Code generation failed due to unknown error: check spec validity\n  cause: #{e.inspect}"
+        puts e.backtrace.join("\n  ")
       end
 
       def _class_name_from_mod(mod)
