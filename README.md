@@ -80,6 +80,6 @@ A minimal `messenger`, with only a name and default types supported must include
 * `types` - if your `.nmspec` file creates custom sub-types, then this is where
   you declare them
 
-  [ruby-lang]: https://www.ruby-lang.org/
-  [gdscript]: https://docs.godotengine.org/en/stable/getting_started/scripting/gdscript/gdscript_basics.html
-  [generals.io]: https://generals.io/
+[ruby-lang]: https://www.ruby-lang.org/
+[gdscript]: https://docs.godotengine.org/en/stable/getting_started/scripting/gdscript/gdscript_basics.html
+[generals.io]: https://generals.io/
