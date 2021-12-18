@@ -200,7 +200,7 @@ module Nmspec
         code << '  # messages'
         code << '  ###########################################'
 
-        msgs.keys.each_with_index do |msg_name, msg_code|
+        msgs&.keys&.each_with_index do |msg_name, msg_code|
           # This figures out which identifiers mentioned in the msg
           # definition must be passed in vs. declared within the method
 

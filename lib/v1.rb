@@ -5,7 +5,8 @@ module Nmspec
     SUPPORTED_SPEC_VERSIONS = [1]
     SUPPORTED_OUTPUT_LANGS = %w(gdscript ruby)
     GEN_OPTS_KEYS = %w(langs spec)
-    REQUIRED_KEYS = %w(version msgr types msgs)
+    REQ_KEYS = %w(version msgr)
+    OPT_KEYS = %w(types msgs)
     BASE_TYPES = %w(
                     i8 u8   i8_list  u8_list
                     i16 u16 i16_list u16_list
@@ -62,11 +63,11 @@ module Nmspec
         [].tap do |errors|
           ##
           # main keys
-          REQUIRED_KEYS.each do |k|
+          REQ_KEYS.each do |k|
             errors << "required key `#{k}` is missing" unless spec.has_key?(k)
           end
 
-          unsupported_keys = spec.keys - REQUIRED_KEYS
+          unsupported_keys = spec.keys - REQ_KEYS - OPT_KEYS
           errors << "spec contains unsupported keys: [#{unsupported_keys.join(', ')}]" unless unsupported_keys.empty?
 
           ##
