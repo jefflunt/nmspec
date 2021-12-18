@@ -11,8 +11,8 @@ msgr:
 types:
   player_name: str16
   player_id: i8
-  tile_id: i16
-  terrain: i8
+  tile_id: u16
+  terrain: u8
   server_code: u8
   server_msg: str32
 
