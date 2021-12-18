@@ -217,7 +217,7 @@ module Nmspec
           # This figures out which identifiers mentioned in the msg
           # definition must be passed in vs. declared within the method
 
-          next if protos[proto_name]['msgs'].empty?
+          next unless protos[proto_name].has_key?('msgs') && !protos[proto_name]['msgs'].empty?
 
           code << ''
           send_local_vars = []
