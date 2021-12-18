@@ -1,0 +1,42 @@
+# Sample nmspec file for the game generals.io
+version: 1
+
+msgr:
+  name: generals io v1
+  desc: V1 of a sample generals.io nmspec language
+
+types:
+  player_name: str16
+  player_id: i8
+  tile_id: i16
+  terrain: i8
+  server_code: u8
+  server_msg: str32
+
+msgs:
+  set_player_name:
+    desc: sets the player name for a given player
+    steps:
+      - w str16 player_name
+  resp_player_name:
+    desc: server message to accept or reject the player name
+    steps:
+      - w server_code response_code
+      - w server_msg  response_msg
+  set_player_id:
+    desc: server message to client to set id/color
+    steps:
+      - w player_id pid
+  player_move:
+    desc: player request to make a move
+    steps:
+      - w tile_id from
+      - w tile_id to
+      - w i16     armies
+  set_tile:
+    desc: server updating client tiles
+    steps:
+      - w tile_id   tid
+      - w terrain   ttype     # 0 = hidden, 1 = blank, 2 = mountains, 3 = fort, 4 = home base
+      - w player_id owner     # -1 = not owned
+      - w i16       armies
