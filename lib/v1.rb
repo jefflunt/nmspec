@@ -46,11 +46,15 @@ module Nmspec
 
         raise "spec failed to parse as valid YAML" unless spec
 
+        valid = Nmspec::V1.valid?(spec)
+        errors = Nmspec::V1.errors(spec)
+        warnings = Nmspec::V1.warnings(spec)
+        code = valid ? langs.each_with_object({}){|lang, hash| hash[lang] = send("to_#{lang}", spec); hash } : langs.each_with_object({}) {|lang, hash| hash[lang] = '' }
         {
-          'valid' => Nmspec::V1.valid?(spec),
-          'errors' => Nmspec::V1.errors(spec),
-          'warnings' => Nmspec::V1.warnings(spec),
-          'code' => langs.each_with_object({}){|lang, hash| hash[lang] = send("to_#{lang}", spec); hash }
+          'valid' => valid,
+          'errors' => errors,
+          'warnings' => warnings,
+          'code' => code
         }
       end
 
@@ -78,7 +82,7 @@ module Nmspec
           ##
           # type validation
           all_types = BASE_TYPES.dup
-          spec['types'].each do |name, type|
+          spec['types']&.each do |name, type|
             errors << "invalid type name `#{name}`" unless name =~ IDENTIFIER_PATTERN
             if _valid_type?(type, all_types)
               all_types << name
@@ -90,7 +94,7 @@ module Nmspec
           ##
           # msg validation
           msgs = spec['msgs']
-          msgs.keys.each do |msg_name|
+          msgs&.keys&.each do |msg_name|
             errors << "invalid msg name `#{msg_name}`" unless msg_name =~ IDENTIFIER_PATTERN
             errors << "msg `#{msg_name}` has no steps" if msgs.dig(msg_name, 'steps')&.empty?
             msgs.dig(msg_name, 'steps') || [].each do |step|
@@ -118,7 +122,7 @@ module Nmspec
           warnings << 'msgr is missing a description' unless spec['msgr'].is_a?(Hash) && spec['msgr'].has_key?('desc')
 
           msgs = spec['msgs']
-          msgs.keys.each do |msg_name|
+          msgs&.keys&.each do |msg_name|
             warnings << "msg `#{msg_name}` is missing a description" unless msgs[msg_name]&.has_key?('desc')
           end
         end

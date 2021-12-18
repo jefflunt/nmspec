@@ -166,7 +166,7 @@ module Nmspec
         code << "    raise \"Cannot send #{type} longer than 16k elements\" if #{type}.length > 2**16"
         code << ''
         code << "    @socket.send([#{type}.length].pack('Q>'), 0)"
-        code << "    @socket.send#{send_contents} }"
+        code << "    @socket.send#{send_contents}"
         code << '  end'
         code << ''
 
