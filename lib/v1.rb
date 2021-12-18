@@ -6,7 +6,7 @@ module Nmspec
     SUPPORTED_OUTPUT_LANGS = %w(gdscript ruby)
     GEN_OPTS_KEYS = %w(langs spec)
     REQ_KEYS = %w(version msgr)
-    OPT_KEYS = %w(types msgs)
+    OPT_KEYS = %w(types protos)
     BASE_TYPES = %w(
                     i8 u8   i8_list  u8_list
                     i16 u16 i16_list u16_list
@@ -38,8 +38,7 @@ module Nmspec
         raise '`langs` key missing' unless opts.has_key?('langs')
         raise 'list of output languages cannot be empty' if opts['langs'].empty?
         raise "invalid list of output languages (expecting Array, got #{opts['langs'].class}" unless opts['langs'].is_a?(Array)
-        raise "list of output languages must only contain strings, but contains non-string elements" unless opts['langs'].all?{|l| l.is_a?(String) }
-        raise "invalid output language(s): [#{opts['langs'].select{|l| !SUPPORTED_OUTPUT_LANGS.include?(l) }.join(', ') }]" unless opts['langs'].all?{|l| SUPPORTED_OUTPUT_LANGS.include?(l) }
+        raise "invalid output language(s): [#{opts['langs'].select{|l| !SUPPORTED_OUTPUT_LANGS.include?(l) }.join(', ') }] - valid options are [#{SUPPORTED_OUTPUT_LANGS.map{|l| "\"#{l}\"" }.join(', ')}]" unless opts['langs'].all?{|l| SUPPORTED_OUTPUT_LANGS.include?(l) }
         raise "invalid spec YAML, check format" unless YAML.load(opts['spec']).is_a?(Hash)
 
         spec = YAML.load(opts['spec'])
@@ -94,24 +93,24 @@ module Nmspec
 
           ##
           # msg validation
-          msgs = spec['msgs']
-          msgs&.keys&.each do |msg_name|
-            errors << "invalid msg name `#{msg_name}`" unless msg_name =~ IDENTIFIER_PATTERN
-            errors << "msg `#{msg_name}` has no steps" if msgs.dig(msg_name, 'steps')&.empty?
-            msgs.dig(msg_name, 'steps') || [].each do |step|
-              mode, type, identifier = step.split.map(&:strip)
-              short_step = [mode, type, identifier].join(' ')
-              errors << "msg `#{msg_name}`, step `#{short_step}` has invalid type: `#{type}`" unless _valid_type?(type, all_types)
+          protos = spec['protos']
+          protos&.keys&.each do |proto_name|
+            errors << "invalid msg name `#{proto_name}`" unless proto_name =~ IDENTIFIER_PATTERN
+            errors << "protocol `#{proto_name}` has no msgs" if protos.dig(proto_name, 'msgs')&.empty?
+            protos.dig(proto_name, 'msgs') || [].each do |msg|
+              mode, type, identifier = msg.split.map(&:strip)
+              short_msg = [mode, type, identifier].join(' ')
+              errors << "msg `#{proto_name}`, msg `#{short_msg}` has invalid type: `#{type}`" unless _valid_type?(type, all_types)
 
               case mode
               when 'r'
-                errors << "reader msg `#{msg_name}`, step `#{short_step}` has missing identifier" if identifier.to_s.empty?
-                errors << "reader msg `#{msg_name}`, step `#{short_step}` has invalid identifier: `#{identifier}`" unless identifier =~ IDENTIFIER_PATTERN
+                errors << "reader protocol `#{proto_name}`, msg `#{short_msg}` has missing identifier" if identifier.to_s.empty?
+                errors << "reader protocol `#{proto_name}`, msg `#{short_msg}` has invalid identifier: `#{identifier}`" unless identifier =~ IDENTIFIER_PATTERN
               when 'w'
-                errors << "writer msg `#{msg_name}`, step `#{short_step}` has missing identifier" if identifier.to_s.empty?
-                errors << "writer msg `#{msg_name}`, step `#{short_step}` has invalid identifier: `#{identifier}`" unless identifier =~ IDENTIFIER_PATTERN
+                errors << "writer protocol `#{proto_name}`, msg `#{short_msg}` has missing identifier" if identifier.to_s.empty?
+                errors << "writer msg `#{proto_name}`, msg `#{short_msg}` has invalid identifier: `#{identifier}`" unless identifier =~ IDENTIFIER_PATTERN
               else
-                errors << "msg `#{msg_name}` has invalid read/write mode (#{mode}) - step: `#{short_step}`" unless VALID_STEP_MODES.include?(mode)
+                errors << "protocol `#{proto_name}` has invalid read/write mode (#{mode}) - msg: `#{short_msg}`" unless VALID_STEP_MODES.include?(mode)
               end
             end
           end
@@ -122,9 +121,9 @@ module Nmspec
         [].tap do |warnings|
           warnings << 'msgr is missing a description' unless spec['msgr'].is_a?(Hash) && spec['msgr'].has_key?('desc')
 
-          msgs = spec['msgs']
-          msgs&.keys&.each do |msg_name|
-            warnings << "msg `#{msg_name}` is missing a description" unless msgs[msg_name]&.has_key?('desc')
+          protos = spec['protos']
+          protos&.keys&.each do |proto_name|
+            warnings << "msg `#{proto_name}` is missing a description" unless protos[proto_name]&.has_key?('desc')
           end
         end
       end
