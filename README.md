@@ -1,6 +1,3 @@
-[ruby-lang]: https://www.ruby-lang.org/
-[gdscript]: https://docs.godotengine.org/en/stable/getting_started/scripting/gdscript/gdscript_basics.html
-[generals.io]: https://generals.io/
 
 `nmspec` (network message specification) is a subset of YAML used to specify
 the format of communication protocols between two sides of a network
@@ -81,3 +78,7 @@ A minimal `messenger`, with only a name and default types supported must include
   * `msgs` - a list of messages in the protocol
 * `types` - if your `.nmspec` file creates custom sub-types, then this is where
   you declare them
+
+  [ruby-lang]: https://www.ruby-lang.org/
+  [gdscript]: https://docs.godotengine.org/en/stable/getting_started/scripting/gdscript/gdscript_basics.html
+  [generals.io]: https://generals.io/
