@@ -49,7 +49,11 @@ module Nmspec
         valid = Nmspec::V1.valid?(spec)
         errors = Nmspec::V1.errors(spec)
         warnings = Nmspec::V1.warnings(spec)
-        code = valid ? langs.each_with_object({}){|lang, hash| hash[lang] = send("to_#{lang}", spec); hash } : langs.each_with_object({}) {|lang, hash| hash[lang] = '' }
+        code = langs.each_with_object({}) do |lang, hash|
+          hash[lang] = send("to_#{lang}", spec)
+          hash
+        end
+
         {
           'valid' => valid,
           'errors' => errors,
@@ -133,10 +137,15 @@ module Nmspec
       end
 
       def to_ruby(spec)
+        puts "SPEC: #{spec}"
         ::Nmspec::Ruby.gen(spec)
+      rescue
+        ''
       end
 
       def to_gdscript
+      rescue
+        ''
       end
 
       def _valid_type?(type, all_types)

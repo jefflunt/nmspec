@@ -1,3 +1,5 @@
+require 'set'
+
 # Nmspec code generator for ruby
 module Nmspec
   module Ruby
@@ -146,13 +148,13 @@ module Nmspec
                                     when 'double_list'
                                       [8, 'G']
                                     when 'i8_list','u8_list'
-                                      [1, type.start_with?('i') ? 'c' : 'C']
+                                      [1, type.start_with?('i') ? 'c*' : 'C*']
                                     when 'i16_list','u16_list'
-                                      [2, type.start_with?('i') ? 's>' : 'S>']
+                                      [2, type.start_with?('i') ? 's>*' : 'S>*']
                                     when 'i32_list','u32_list'
-                                      [4, type.start_with?('i') ? 'l>' : 'L>']
+                                      [4, type.start_with?('i') ? 'l>*' : 'L>*']
                                     when 'i64_list','u64_list'
-                                      [8, type.start_with?('i') ? 'q>' : 'Q>']
+                                      [8, type.start_with?('i') ? 'q>*' : 'Q>*']
                                     else
                                       next
                                     end
@@ -166,8 +168,8 @@ module Nmspec
       def _type_list_reader_writer_methods(type, num_bytes, pack_type=nil)
         code = []
 
-        send_contents = pack_type ?  "([#{type}].pack('#{pack_type}*'), 0)" : "(#{type}, 0)"
-        recv_contents = pack_type ? "(#{num_bytes}).unpack('#{pack_type}')" : "(#{num_bytes})"
+        send_contents = pack_type ?  "(#{type}.pack('#{pack_type}'), 0)" : "(#{type}, 0)"
+        recv_contents = pack_type ? "(#{num_bytes} * #{type}.length).unpack('#{pack_type}')" : "(#{num_bytes})"
 
         code << "  def r_#{type}"
         code << "    @socket.recv#{recv_contents}"
@@ -207,11 +209,11 @@ module Nmspec
       def _protos_methods(protos)
         code = []
 
-        if protos&.keys && protos&.keys&.length > 0
-          code << '  ###########################################'
-          code << '  # messages'
-          code << '  ###########################################'
-        end
+        return code unless protos&.keys && protos&.keys&.length > 0
+
+        code << '  ###########################################'
+        code << '  # messages'
+        code << '  ###########################################'
 
         protos&.keys&.each_with_index do |proto_name, proto_code|
           # This figures out which identifiers mentioned in the msg
@@ -222,7 +224,7 @@ module Nmspec
           code << ''
           send_local_vars = []
           recv_local_vars = []
-          send_passed_params, recv_passed_params = protos[proto_name]['msgs']
+          send_passed_params, recv_passed_params = protos.dig(proto_name, 'msgs')
             .inject([Set.new, Set.new]) do |all_params, msg|
               send_params, recv_params = all_params
               mode, type, identifier = msg.split
@@ -230,7 +232,7 @@ module Nmspec
               case mode
               when 'r'
                 send_local_vars << [type, identifier]
-                recv_params << identifier unless send_local_vars.map{|v| v.last}.include?(identifier)
+                recv_params << identifier unless recv_local_vars.map{|v| v.last}.include?(identifier)
               when 'w'
                 recv_local_vars << [type, identifier]
                 send_params << identifier unless send_local_vars.map{|v| v.last}.include?(identifier)

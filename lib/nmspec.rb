@@ -1,2 +1,2 @@
-require_relative './v1'
-require_relative './ruby'
+require_relative './nmspec/v1'
+require_relative './nmspec/ruby'

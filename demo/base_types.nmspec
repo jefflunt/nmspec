@@ -1,4 +1,3 @@
-
 version: 1
 
 msgr:
@@ -33,4 +32,4 @@ protos:
       - w double      double
       - w double_list double_list
       - w str         str
-      - w strlist     str_list
+      - w str_list     str_list
