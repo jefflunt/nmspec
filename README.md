@@ -60,8 +60,6 @@ A `protocol` is a list of `messages` that pass between two `Messenger` peers. A
 Messages are either read (`r`) or writes (`w`) of types over a network
 connection. `Messages` also define logical names for parameters and returned data.
 
-```
-
 # `nmspec` format
 
 `nmspec` is a subset of YAML. So, first and foremost, if your `.nmspec` file is
