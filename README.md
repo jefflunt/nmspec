@@ -168,6 +168,21 @@ protos:
       - w i16       armies
 ```
 
+## How code is generated
+
+Output program code is generated in the following manner:
+
+1. `nmspec` file is read - the source YAML file is read
+2. validity check - the YAML is checked to make sure it conforms to the `nmspec`
+   subset; useful errors and warnings in formatting may be added if mistakes are
+   found
+3. If all is well, then the parsed YAML is converted into a data structure that
+   is designed to be easy for code generators to interpret
+4. The data structure is passed on to one code generator per requested output
+   language
+5. The resulting output code in all requested languages is gathered together and
+   returned to the user
+
   [ruby-lang]: https://www.ruby-lang.org/
   [gdscript]: https://docs.godotengine.org/en/stable/getting_started/scripting/gdscript/gdscript_basics.html
   [generals.io]: https://generals.io/
