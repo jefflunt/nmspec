@@ -27,16 +27,17 @@ module Nmspec
           BASE_TYPES.each do |type|
             parsed[:types] << {
               name: type,
-              subtype: nil,
+              base_type: nil,
               kind: _kind_of(type),
             }
           end
 
-          (spec_hash['types'] || []).each do |name, subtype|
+          (spec_hash['types'] || []).each do |type_spec|
+            base_type, name = type_spec.split
             parsed[:types] << {
               name: name,
-              subtype: subtype,
-              kind: _kind_of(subtype),
+              base_type: base_type,
+              kind: _kind_of(base_type),
             }
           end
 
