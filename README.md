@@ -11,13 +11,6 @@ languages:
 
 Additional languages can be added if there is interest.
 
-# Basic example
-
-* `demo/minimal.nmspec` contains a minimal example of an `.nmspec` file.
-* `demo/base_types.nmspec` contains a messenger with a single protocol that
-* `demo/generals.io.nmspec` contains a theoretical implementation of the
-messaging required for a game of [generals.io][generals.io]
-
 # Sample usage
 
 ```ruby
@@ -80,8 +73,19 @@ A minimal `messenger`, with only a name and default types supported must include
 
 ## Sample `.nmspec` file
 
-The `.nmspec` file, `demo/base_types.nmspec` is included for testing all base
-types.
+`demo/minimal.nmspec` shows the absolute minimum amount of information needed
+to get a basic messenger working.
+
+```yaml
+version: 1
+
+msgr:
+  name: basic
+  desc: this messenger only supports the built-in types, and has no custom protocols
+```
+
+`demo/base_types.nmspec` shows an example of a one-protocol messenger that is
+used to ensure that all base types can be read and written correctly.
 
 ```yaml
 version: 1
@@ -121,8 +125,8 @@ protos:
       - w str_list    str_list
 ```
 
-Here's a theoretical implementation of an `nmspec messenger` for the game
-[generals.io][generals.io]:
+`demo/generals.io.nmspec` contains a theoretical implementation of a messenger
+for the game, [generals.io][generals.io]:
 
 ```yaml
 version: 1
