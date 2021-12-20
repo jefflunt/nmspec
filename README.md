@@ -132,12 +132,12 @@ msgr:
   desc: a sample generals.io nmspec
 
 types:
-  player_name: str
-  player_id: i8
-  tile_id: u16
-  terrain: u8
-  server_code: u8
-  server_msg: str
+  - str player_name
+  - i8  player_id
+  - u16 tile_id
+  - u8  terrain
+  - u8  server_code
+  - str server_msg
 
 protos:
   - name: set_player_name
