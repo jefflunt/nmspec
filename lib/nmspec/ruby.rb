@@ -230,22 +230,22 @@ module Nmspec
       def _protos_methods(protos)
         code = []
 
-        return code unless protos&.keys && protos&.keys&.length > 0
+        return code unless protos && protos&.length > 0
 
         code << '  ###########################################'
         code << '  # messages'
         code << '  ###########################################'
 
-        protos&.keys&.each_with_index do |proto_name, proto_code|
+        protos&.each_with_index do |proto, proto_code|
           # This figures out which identifiers mentioned in the msg
           # definition must be passed in vs. declared within the method
 
-          next unless protos[proto_name].has_key?('msgs') && !protos[proto_name]['msgs'].empty?
+          next unless proto.has_key?('msgs') && !proto['msgs'].empty?
 
           code << ''
           send_local_vars = []
           recv_local_vars = []
-          send_passed_params, recv_passed_params = protos.dig(proto_name, 'msgs')
+          send_passed_params, recv_passed_params = proto['msgs']
             .inject([Set.new, Set.new]) do |all_params, msg|
               send_params, recv_params = all_params
               mode, type, identifier = msg.split
@@ -266,19 +266,19 @@ module Nmspec
 
           ##
           # send
-          code << _proto_method('send', proto_name, protos, send_local_vars, send_passed_params, proto_code)
+          code << _proto_method('send', proto, protos, send_local_vars, send_passed_params, proto_code)
           code << ''
-          code << _proto_method('recv', proto_name, protos, recv_local_vars, recv_passed_params, proto_code)
+          code << _proto_method('recv', proto, protos, recv_local_vars, recv_passed_params, proto_code)
         end
 
         code
       end
       ##
       # Builds a single protocol method
-      def _proto_method(kind, proto_name, protos, local_vars, passed_params, proto_code)
+      def _proto_method(kind, proto, protos, local_vars, passed_params, proto_code)
         code = []
 
-        code << "  # #{protos[proto_name]['desc']}" if protos[proto_name]['desc']
+        code << "  # #{proto['desc']}" if proto['desc']
         unless local_vars.empty?
           code << '  #'
           code << '  # returns:  (type | local var name)'
@@ -287,9 +287,9 @@ module Nmspec
           code << '  # ]'
         end
 
-        code << "  def #{kind}_#{proto_name}#{passed_params.length > 0 ? "(#{(passed_params.to_a).join(', ')})" : ''}"
+        code << "  def #{kind}_#{proto['name']}#{passed_params.length > 0 ? "(#{(passed_params.to_a).join(', ')})" : ''}"
 
-        msgs = protos[proto_name]['msgs']
+        msgs = proto['msgs']
         code << "    w_i8(#{proto_code})" if kind.eql?('send')
         msgs.each do |msg|
           msg = kind.eql?('send') ? msg : _flip_mode(msg)

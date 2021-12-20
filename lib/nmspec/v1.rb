@@ -98,23 +98,23 @@ module Nmspec
           ##
           # msg validation
           protos = spec['protos']
-          protos&.keys&.each do |proto_name|
-            errors << "invalid msg name `#{proto_name}`" unless proto_name =~ IDENTIFIER_PATTERN
-            errors << "protocol `#{proto_name}` has no msgs" if protos.dig(proto_name, 'msgs')&.empty?
-            protos.dig(proto_name, 'msgs') || [].each do |msg|
+          protos&.each do |proto|
+            errors << "invalid msg name `#{proto['name']}`" unless proto['name'] =~ IDENTIFIER_PATTERN
+            errors << "protocol `#{proto['name']}` has no msgs" if proto['msgs']&.empty?
+            proto['msgs'] || [].each do |msg|
               mode, type, identifier = msg.split.map(&:strip)
               short_msg = [mode, type, identifier].join(' ')
-              errors << "msg `#{proto_name}`, msg `#{short_msg}` has invalid type: `#{type}`" unless _valid_type?(type, all_types)
+              errors << "msg `#{proto['name']}`, msg `#{short_msg}` has invalid type: `#{type}`" unless _valid_type?(type, all_types)
 
               case mode
               when 'r'
-                errors << "reader protocol `#{proto_name}`, msg `#{short_msg}` has missing identifier" if identifier.to_s.empty?
-                errors << "reader protocol `#{proto_name}`, msg `#{short_msg}` has invalid identifier: `#{identifier}`" unless identifier =~ IDENTIFIER_PATTERN
+                errors << "reader protocol `#{proto['name']}`, msg `#{short_msg}` has missing identifier" if identifier.to_s.empty?
+                errors << "reader protocol `#{proto['name']}`, msg `#{short_msg}` has invalid identifier: `#{identifier}`" unless identifier =~ IDENTIFIER_PATTERN
               when 'w'
-                errors << "writer protocol `#{proto_name}`, msg `#{short_msg}` has missing identifier" if identifier.to_s.empty?
-                errors << "writer msg `#{proto_name}`, msg `#{short_msg}` has invalid identifier: `#{identifier}`" unless identifier =~ IDENTIFIER_PATTERN
+                errors << "writer protocol `#{proto['name']}`, msg `#{short_msg}` has missing identifier" if identifier.to_s.empty?
+                errors << "writer msg `#{proto['name']}`, msg `#{short_msg}` has invalid identifier: `#{identifier}`" unless identifier =~ IDENTIFIER_PATTERN
               else
-                errors << "protocol `#{proto_name}` has invalid read/write mode (#{mode}) - msg: `#{short_msg}`" unless VALID_STEP_MODES.include?(mode)
+                errors << "protocol `#{proto['name']}` has invalid read/write mode (#{mode}) - msg: `#{short_msg}`" unless VALID_STEP_MODES.include?(mode)
               end
             end
           end
@@ -125,9 +125,8 @@ module Nmspec
         [].tap do |warnings|
           warnings << 'msgr is missing a description' unless spec['msgr'].is_a?(Hash) && spec['msgr'].has_key?('desc')
 
-          protos = spec['protos']
-          protos&.keys&.each do |proto_name|
-            warnings << "msg `#{proto_name}` is missing a description" unless protos[proto_name]&.has_key?('desc')
+          spec['protos']&.each do |proto|
+            warnings << "msg `#{proto['name']}` is missing a description" unless proto.has_key?('desc')
           end
         end
       end
