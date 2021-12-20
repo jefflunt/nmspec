@@ -1,7 +1,3 @@
-# .nmspec files are a subset of YAML, and because of that they support comments
-#
-# nmspec: [opcode, <payload>]
-#          1-byte,  n-bytes
 version: 1
 
 msgr:

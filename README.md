@@ -121,6 +121,53 @@ protos:
       - w str_list    str_list
 ```
 
+Here's a theoretical implementation of an `nmspec messenger` for the game
+[generals.io][generals.io]:
+
+```yaml
+version: 1
+
+msgr:
+  name: generals io
+  desc: a sample generals.io nmspec
+
+types:
+  player_name: str
+  player_id: i8
+  tile_id: u16
+  terrain: u8
+  server_code: u8
+  server_msg: str
+
+protos:
+  - name: set_player_name
+    desc: sets the player name for a given player
+    msgs:
+      - w player_name player_name
+  - name: resp_player_name
+    desc: server message to accept or reject the player name
+    msgs:
+      - w server_code resp_code
+      - w server_msg  resp_msg
+  - name: set_player_id
+    desc: server message to client to set id/color
+    msgs:
+      - w player_id pid
+  - name: player_move
+    desc: player request to make a move
+    msgs:
+      - w tile_id from
+      - w tile_id to
+      - w i16     armies
+  - name: set_tile
+    desc: server updating client tiles
+    msgs:
+      - w tile_id   tid
+      - w terrain   ttype # 0 = hidden, 1 = blank, 2 = mountains, 3 = fort, 4 = home base
+      - w player_id owner # -1 = not owned
+      - w i16       armies
+```
+
   [ruby-lang]: https://www.ruby-lang.org/
   [gdscript]: https://docs.godotengine.org/en/stable/getting_started/scripting/gdscript/gdscript_basics.html
   [generals.io]: https://generals.io/
