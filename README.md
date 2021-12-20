@@ -16,13 +16,14 @@ Additional languages can be added if there is interest.
 ```ruby
 # add 'nmspec' to your Gemfile
 
-require 'nmspec'
+$ irb
 
+ > require 'nmspec'
+=> true
  > pp  Nmspec::V1.gen({
          'spec' => IO.read('generals.io.nmspec'),
          'langs' => ['ruby']
        })
-
 => {
      "valid"=>true,
      "errors"=>[],
