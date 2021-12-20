@@ -113,7 +113,7 @@ module Nmspec
         code << '  ###########################################'
         code << ''
         code << "  def r_str"
-        code << "    bytes = @socket.recv(2).unpack('S>')"
+        code << "    bytes = @socket.recv(2).unpack('S>').first"
         code << "    str = @socket.recv(bytes)"
         code << ''
         code << "    [str]"
@@ -124,6 +124,28 @@ module Nmspec
         code << ''
         code << "    @socket.send([str.length].pack('S>'), 0)"
         code << "    @socket.send(str, 0)"
+        code << '  end'
+        code << ''
+        code << "  def r_str_list"
+        code << '    strings = []'
+        code << ''
+        code << "    @socket.recv(2).unpack('S>').first.times do"
+        code << "      str_length = @socket.recv(2).unpack('S>').first"
+        code << "      strings << @socket.recv(str_length)"
+        code << '    end'
+        code << ''
+        code << '    [strings]'
+        code << '  end'
+        code << ''
+        code << "  def w_str_list(str_list)"
+        code << "    raise \"Cannot send a string list with more than 16k string\" if str_list.length > 2**16"
+        code << "    raise \"Cannot send string longer than 16k bytes\" if str_list.map{|s| s.length }.max > 2**16"
+        code << ''
+        code << "    @socket.send([str_list.length].pack('S>'), 0)"
+        code << '    str_list.each do |str|'
+        code << "      @socket.send([str.length].pack('S>'), 0)"
+        code << "      @socket.send(str, 0)"
+        code << '    end'
         code << '  end'
         code << ''
 
@@ -148,13 +170,13 @@ module Nmspec
                                     when 'double_list'
                                       [8, 'G']
                                     when 'i8_list','u8_list'
-                                      [1, type.start_with?('i') ? 'c*' : 'C*']
+                                      [1, type.start_with?('i') ? 'c' : 'C']
                                     when 'i16_list','u16_list'
-                                      [2, type.start_with?('i') ? 's>*' : 'S>*']
+                                      [2, type.start_with?('i') ? 's>' : 'S>']
                                     when 'i32_list','u32_list'
-                                      [4, type.start_with?('i') ? 'l>*' : 'L>*']
+                                      [4, type.start_with?('i') ? 'l>' : 'L>']
                                     when 'i64_list','u64_list'
-                                      [8, type.start_with?('i') ? 'q>*' : 'Q>*']
+                                      [8, type.start_with?('i') ? 'q>' : 'Q>']
                                     else
                                       next
                                     end
@@ -168,18 +190,21 @@ module Nmspec
       def _type_list_reader_writer_methods(type, num_bytes, pack_type=nil)
         code = []
 
-        send_contents = pack_type ?  "(#{type}.pack('#{pack_type}'), 0)" : "(#{type}, 0)"
-        recv_contents = pack_type ? "(#{num_bytes} * #{type}.length).unpack('#{pack_type}')" : "(#{num_bytes})"
+        send_contents = pack_type ?  "(#{type}.pack('#{pack_type}*'), 0)" : "(#{type}, 0)"
+        recv_contents = pack_type ? "(#{num_bytes} * #{type}.length).unpack('#{pack_type}*')" : "(#{num_bytes})"
 
         code << "  def r_#{type}"
-        code << "    @socket.recv#{recv_contents}"
+        code << "    puts \"\#{Process.pid} reading #{type} ...\""
+        code << "    list_len = @socket.recv(2).unpack('S>').first"
+        code << "    @socket.recv(list_len * #{num_bytes}).unpack('#{pack_type}*')"
         code << '  end'
         code << ''
         code << "  def w_#{type}(#{type})"
         code << "    raise \"Cannot send #{type} longer than 16k elements\" if #{type}.length > 2**16"
         code << ''
-        code << "    @socket.send([#{type}.length].pack('Q>'), 0)"
-        code << "    @socket.send#{send_contents}"
+        code << "    puts \"\#{Process.pid} writing #{type} ...\""
+        code << "    @socket.send([#{type}.length].pack('S>'), 0)"
+        code << "    #{type}.each{|e| @socket.send([e].pack('#{pack_type}*'), 0) }"
         code << '  end'
         code << ''
 

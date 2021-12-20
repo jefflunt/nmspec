@@ -7,36 +7,25 @@ class TestBaseTypes < Minitest::Test
 
   def setup
     begin
-      nmspec = IO.read('demo/base_types.nmspec')
-      parse_result = Nmspec::V1.gen({
-        'spec' => nmspec,
-        'langs' => ['ruby'],
-      })
+      nmspec_parse_and_load_demo('base_types')
 
-      starting_classes = ObjectSpace.each_object(Class)
-      eval(parse_result['code']['ruby'])
+      server = Process.fork {
+        tcp_server = TCPServer.new(TEST_PORT)
+        puts "#{Process.pid} starting server on #{TEST_PORT}"
+        loop do
+          client = tcp_server.accept
+          msgr = BaseTypesMsgr.new(client)
+          client.recv(1) # read and discard msg_code
+          msgr.send_all_base_types(*msgr.recv_all_base_types.first)
+          client.close
+        end
+      }
+
+      Process.detach(server)
+      sleep 1
     rescue
       puts "Failed to eval code: `#{parse_result.inspect}`"
     end
-
-#    @server_thread = Thread.new do
-#      begin
-#        loop do
-#          @server = TCPServer.new(TEST_PORT)
-#          client = @server.accept
-#          @recv_data = BaseTypesMsgr
-#                        .new(client)
-#                        .recv_all_base_types
-#          client.close
-#        end
-#      rescue IOError
-#        puts "Exiting due to IOError"
-#      end
-#    end
-  end
-
-  def teardown
-    @server.close
   end
 
   def test_send_all_base_types
@@ -65,23 +54,13 @@ class TestBaseTypes < Minitest::Test
       ['test string 1', 'test string 2', 'test string 3']
     ]
 
-    server = TCPServer.new(TEST_PORT)
-
     s = TCPSocket.new('localhost', TEST_PORT)
-    client = server.accept
-    recv_data = BaseTypesMsgr
-                  .new(client)
-                  .recv_all_base_types
-    client.close
-    server.close
+    msgr = BaseTypesMsgr.new(s)
+    msgr.send_all_base_types(*send_data)
+    s.recv(1) # read and discard msg_code
+    recv_data = msgr.recv_all_base_types.first
 
-    BaseTypesMsgr
-      .new(s)
-      .send_all_base_types(*send_data)
-    s.close
-
-    Thread.pass
-
+    puts "ASSERTING ..."
     assert_equal(send_data, recv_data)
   end
 end
