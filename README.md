@@ -73,11 +73,13 @@ A minimal `messenger`, with only a name and default types supported must include
 
 ## Optional keys:
 
-* `protos` - a name for the messaging protocol
-  * `desc` - a description of the message
-  * `msgs` - a list of messages in the protocol
 * `types` - if your `.nmspec` file creates custom sub-types, then this is where
   you declare them
+* `protos` - the top-level key for the list of messaging protocols
+  * for each protocol:
+    * `name` - the name of the protocol (converted to function/method name)
+    * `desc` - a description of the protocol
+    * `msgs` - a list of messages in the protocol
 
   [ruby-lang]: https://www.ruby-lang.org/
   [gdscript]: https://docs.godotengine.org/en/stable/getting_started/scripting/gdscript/gdscript_basics.html
