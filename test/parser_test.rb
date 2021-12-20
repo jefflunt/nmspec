@@ -4,6 +4,7 @@ class TestParser < Minitest::Test
   def setup
     @minimal_spec = YAML.load(IO.read('demo/minimal.nmspec'))
     @base_types_spec = YAML.load(IO.read('demo/base_types.nmspec'))
+    @generals_io_spec = YAML.load(IO.read('demo/generals.io.nmspec'))
   end
 
   def test_parse_minimal
@@ -17,90 +18,112 @@ class TestParser < Minitest::Test
         types: [
           {
             name: 'i8',
+            subtype: nil,
             kind: 'numeric',
           },
           {
             name: "u8",
+            subtype: nil,
             kind: 'numeric',
           },
           {
             name: "i8_list",
+            subtype: nil,
             kind: 'numeric_list',
           },
           {
             name: "u8_list",
+            subtype: nil,
             kind: 'numeric_list',
           },
           {
             name: "i16",
+            subtype: nil,
             kind: 'numeric',
           },
           {
             name: "u16",
+            subtype: nil,
             kind: 'numeric',
           },
           {
             name: "i16_list",
+            subtype: nil,
             kind: 'numeric_list',
           },
           {
             name: "u16_list",
+            subtype: nil,
             kind: 'numeric_list',
           },
           {
             name: "i32",
+            subtype: nil,
             kind: 'numeric',
           },
           {
             name: "u32",
+            subtype: nil,
             kind: 'numeric',
           },
           {
             name: "i32_list",
+            subtype: nil,
             kind: 'numeric_list',
           },
           {
             name: "u32_list",
+            subtype: nil,
             kind: 'numeric_list',
           },
           {
             name: "i64",
+            subtype: nil,
             kind: 'numeric',
           },
           {
             name: "u64",
+            subtype: nil,
             kind: 'numeric',
           },
           {
             name: "i64_list",
+            subtype: nil,
             kind: 'numeric_list',
           },
           {
             name: "u64_list",
+            subtype: nil,
             kind: 'numeric_list',
           },
           {
             name: "float",
+            subtype: nil,
             kind: 'numeric',
           },
           {
             name: "float_list",
+            subtype: nil,
             kind: 'numeric_list',
           },
           {
             name: "double",
+            subtype: nil,
             kind: 'numeric',
           },
           {
             name: "double_list",
+            subtype: nil,
             kind: 'numeric_list',
           },
           {
             name: "str",
+            subtype: nil,
             kind: 'str',
           },
           {
             name: "str_list",
+            subtype: nil,
             kind: 'str_list',
           },
         ],
@@ -121,90 +144,112 @@ class TestParser < Minitest::Test
         types: [
           {
             name: 'i8',
+            subtype: nil,
             kind: 'numeric',
           },
           {
             name: "u8",
+            subtype: nil,
             kind: 'numeric',
           },
           {
             name: "i8_list",
+            subtype: nil,
             kind: 'numeric_list',
           },
           {
             name: "u8_list",
+            subtype: nil,
             kind: 'numeric_list',
           },
           {
             name: "i16",
+            subtype: nil,
             kind: 'numeric',
           },
           {
             name: "u16",
+            subtype: nil,
             kind: 'numeric',
           },
           {
             name: "i16_list",
+            subtype: nil,
             kind: 'numeric_list',
           },
           {
             name: "u16_list",
+            subtype: nil,
             kind: 'numeric_list',
           },
           {
             name: "i32",
+            subtype: nil,
             kind: 'numeric',
           },
           {
             name: "u32",
+            subtype: nil,
             kind: 'numeric',
           },
           {
             name: "i32_list",
+            subtype: nil,
             kind: 'numeric_list',
           },
           {
             name: "u32_list",
+            subtype: nil,
             kind: 'numeric_list',
           },
           {
             name: "i64",
+            subtype: nil,
             kind: 'numeric',
           },
           {
             name: "u64",
+            subtype: nil,
             kind: 'numeric',
           },
           {
             name: "i64_list",
+            subtype: nil,
             kind: 'numeric_list',
           },
           {
             name: "u64_list",
+            subtype: nil,
             kind: 'numeric_list',
           },
           {
             name: "float",
+            subtype: nil,
             kind: 'numeric',
           },
           {
             name: "float_list",
+            subtype: nil,
             kind: 'numeric_list',
           },
           {
             name: "double",
+            subtype: nil,
             kind: 'numeric',
           },
           {
             name: "double_list",
+            subtype: nil,
             kind: 'numeric_list',
           },
           {
             name: "str",
+            subtype: nil,
             kind: 'str',
           },
           {
             name: "str_list",
+            subtype: nil,
             kind: 'str_list',
           },
         ],
@@ -328,6 +373,248 @@ class TestParser < Minitest::Test
         ],
       },
       Nmspec::Parser.parse(@base_types_spec),
+    )
+  end
+
+  def test_parse_generals_io
+    assert_equal(
+      {
+        version: 1,
+        msgr: {
+          name: 'generals io',
+          desc: 'a sample generals.io nmspec'
+        },
+        types: [
+          {
+            name: 'i8',
+            subtype: nil,
+            kind: 'numeric',
+          },
+          {
+            name: "u8",
+            subtype: nil,
+            kind: 'numeric',
+          },
+          {
+            name: "i8_list",
+            subtype: nil,
+            kind: 'numeric_list',
+          },
+          {
+            name: "u8_list",
+            subtype: nil,
+            kind: 'numeric_list',
+          },
+          {
+            name: "i16",
+            subtype: nil,
+            kind: 'numeric',
+          },
+          {
+            name: "u16",
+            subtype: nil,
+            kind: 'numeric',
+          },
+          {
+            name: "i16_list",
+            subtype: nil,
+            kind: 'numeric_list',
+          },
+          {
+            name: "u16_list",
+            subtype: nil,
+            kind: 'numeric_list',
+          },
+          {
+            name: "i32",
+            subtype: nil,
+            kind: 'numeric',
+          },
+          {
+            name: "u32",
+            subtype: nil,
+            kind: 'numeric',
+          },
+          {
+            name: "i32_list",
+            subtype: nil,
+            kind: 'numeric_list',
+          },
+          {
+            name: "u32_list",
+            subtype: nil,
+            kind: 'numeric_list',
+          },
+          {
+            name: "i64",
+            subtype: nil,
+            kind: 'numeric',
+          },
+          {
+            name: "u64",
+            subtype: nil,
+            kind: 'numeric',
+          },
+          {
+            name: "i64_list",
+            subtype: nil,
+            kind: 'numeric_list',
+          },
+          {
+            name: "u64_list",
+            subtype: nil,
+            kind: 'numeric_list',
+          },
+          {
+            name: "float",
+            subtype: nil,
+            kind: 'numeric',
+          },
+          {
+            name: "float_list",
+            subtype: nil,
+            kind: 'numeric_list',
+          },
+          {
+            name: "double",
+            subtype: nil,
+            kind: 'numeric',
+          },
+          {
+            name: "double_list",
+            subtype: nil,
+            kind: 'numeric_list',
+          },
+          {
+            name: "str",
+            subtype: nil,
+            kind: 'str',
+          },
+          {
+            name: "str_list",
+            subtype: nil,
+            kind: 'str_list',
+          },
+          {
+            name: 'player_name',
+            subtype: 'str',
+            kind: 'str',
+          },
+          {
+            name: 'player_id',
+            subtype: 'i8',
+            kind: 'numeric',
+          },
+          {
+            name: 'tile_id',
+            subtype: 'u16',
+            kind: 'numeric',
+          },
+          {
+            name: 'terrain',
+            subtype: 'u8',
+            kind: 'numeric',
+          },
+          {
+            name: 'server_code',
+            subtype: 'u8',
+            kind: 'numeric',
+          },
+          {
+            name: 'server_msg',
+            subtype: 'str',
+            kind: 'str',
+          },
+        ],
+        protos: [
+          {
+            name: 'set_player_name',
+            desc: 'sets the player name for a given player',
+            msgs: [
+              {
+                mode: :write,
+                type: 'player_name',
+                identifier: 'player_name',
+              },
+            ],
+          },
+          {
+            name: 'resp_player_name',
+            desc: 'server message to accept or reject the player name',
+            msgs: [
+              {
+                mode: :write,
+                type: 'server_code',
+                identifier: 'resp_code',
+              },
+              {
+                mode: :write,
+                type: 'server_msg',
+                identifier: 'resp_msg',
+              },
+            ],
+          },
+          {
+            name: 'set_player_id',
+            desc: 'server message to client to set id/color',
+            msgs: [
+              {
+                mode: :write,
+                type: 'player_id',
+                identifier: 'pid',
+              },
+            ],
+          },
+          {
+            name: 'player_move',
+            desc: 'player request to make a move',
+            msgs: [
+              {
+                mode: :write,
+                type: 'tile_id',
+                identifier: 'from',
+              },
+              {
+                mode: :write,
+                type: 'tile_id',
+                identifier: 'to',
+              },
+              {
+                mode: :write,
+                type: 'i16',
+                identifier: 'armies',
+              },
+            ],
+          },
+          {
+            name: 'set_tile',
+            desc: 'server updating client tiles',
+            msgs: [
+              {
+                mode: :write,
+                type: 'tile_id',
+                identifier: 'tid',
+              },
+              {
+                mode: :write,
+                type: 'terrain',
+                identifier: 'ttype',
+              },
+              {
+                mode: :write,
+                type: 'player_id',
+                identifier: 'owner',
+              },
+              {
+                mode: :write,
+                type: 'i16',
+                identifier: 'armies',
+              },
+            ],
+          },
+        ],
+      },
+      Nmspec::Parser.parse(@generals_io_spec),
     )
   end
 end

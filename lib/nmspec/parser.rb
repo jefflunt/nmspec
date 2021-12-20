@@ -24,10 +24,19 @@ module Nmspec
           }
 
           parsed[:types] = []
-          ((spec_hash['types'] || []) + BASE_TYPES).each do |type|
+          BASE_TYPES.each do |type|
             parsed[:types] << {
               name: type,
+              subtype: nil,
               kind: _kind_of(type),
+            }
+          end
+
+          (spec_hash['types'] || []).each do |name, subtype|
+            parsed[:types] << {
+              name: name,
+              subtype: subtype,
+              kind: _kind_of(subtype),
             }
           end
 

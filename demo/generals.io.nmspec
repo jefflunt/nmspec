@@ -5,38 +5,38 @@
 version: 1
 
 msgr:
-  name: generals io v1
-  desc: V1 of a sample generals.io nmspec language
+  name: generals io
+  desc: a sample generals.io nmspec
 
 types:
-  player_name: str16
+  player_name: str
   player_id: i8
   tile_id: u16
   terrain: u8
   server_code: u8
-  server_msg: str32
+  server_msg: str
 
 protos:
-  set_player_name:
+  - name: set_player_name
     desc: sets the player name for a given player
     msgs:
-      - w str16 player_name
-  resp_player_name:
+      - w player_name player_name
+  - name: resp_player_name
     desc: server message to accept or reject the player name
     msgs:
-      - w server_code response_code
-      - w server_msg  response_msg
-  set_player_id:
+      - w server_code resp_code
+      - w server_msg  resp_msg
+  - name: set_player_id
     desc: server message to client to set id/color
     msgs:
       - w player_id pid
-  player_move:
+  - name: player_move
     desc: player request to make a move
     msgs:
       - w tile_id from
       - w tile_id to
       - w i16     armies
-  set_tile:
+  - name: set_tile
     desc: server updating client tiles
     msgs:
       - w tile_id   tid
