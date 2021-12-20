@@ -9,10 +9,7 @@ languages:
 * [Ruby 3.0.x][ruby-lang]
 * [GDScript 3.4][gdscript]
 
-Additional languages can be added if there is interest. If so, then I will move
-the Ruby and GDScript code generators to their own gems, and encourage other
-language contributors to build their own gems to support their output
-languages.
+Additional languages can be added if there is interest.
 
 # Basic example
 
