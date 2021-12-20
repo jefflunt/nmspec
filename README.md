@@ -14,12 +14,23 @@ Additional languages can be added if there is interest.
 # Sample usage
 
 ```ruby
-pp  Nmspec::V1.gen(
-      {
-        'spec' => IO.read('generals.io.nmspec'),
-        'langs' => ['ruby']
-      }
-    )
+# add 'nmspec' to your Gemfile
+
+require 'nmspec'
+
+ > pp  Nmspec::V1.gen({
+         'spec' => IO.read('generals.io.nmspec'),
+         'langs' => ['ruby']
+       })
+
+=> {
+     "valid"=>true,
+     "errors"=>[],
+     "warnings"=>[],
+     "code"=> {
+       "ruby"=> "< a string of generated Ruby code that you can save to a file>"
+     }
+   }
 ```
 
 # Main concepts
