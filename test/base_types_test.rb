@@ -1,6 +1,5 @@
 require 'minitest/autorun'
 require 'socket'
-require_relative '../lib/nmspec'
 
 class TestBaseTypes < Minitest::Test
   TEST_PORT = 9834
@@ -30,9 +29,9 @@ class TestBaseTypes < Minitest::Test
               begin
                 break TCPSocket.new('localhost', TEST_PORT)
               rescue
-                break 'Failed to connect' if conn_tries == 3
+                break 'Failed to connect' if conn_tries == 6
                 conn_tries += 1
-                sleep 0.5
+                sleep 0.25
               end
             end
 

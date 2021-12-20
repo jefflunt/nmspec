@@ -2,4 +2,4 @@ version: 1
 
 msgr:
   name: basic
-  desc: this messenger only supports the built-in types, and has no custom messages
+  desc: this messenger only supports the built-in types, and has no custom protocols

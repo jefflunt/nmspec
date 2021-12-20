@@ -2,11 +2,11 @@ version: 1
 
 msgr:
   name: base types
-  desc: this messenger only supports the built-in types, and has no custom messages
+  desc: this messenger includes a single protocol that is used to test reading/writing of all base types
 
 protos:
   - name: all_base_types
-    desc: write all base types, then read them back
+    desc: write all base types
     msgs:
       # LEGEND: `m` is either 'w' (write) or 'r' (read)
       # m type        var name
