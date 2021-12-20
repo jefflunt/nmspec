@@ -11,7 +11,7 @@ def nmspec_parse_and_load_demo(kind)
     'langs' => ['ruby'],
   })
 
-  filename = "codegen_output/#{kind}.rb"
+  filename = "generated_code/#{kind}.rb"
   File.open(filename, 'w') do |f|
     f.puts parse_result.dig('code', 'ruby')
   end
