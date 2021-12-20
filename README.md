@@ -81,6 +81,49 @@ A minimal `messenger`, with only a name and default types supported must include
     * `desc` - a description of the protocol
     * `msgs` - a list of messages in the protocol
 
+## Sample `.nmspec` file
+
+The `.nmspec` file, `demo/base_types.nmspec` is included for testing all base
+types.
+
+```yaml
+version: 1
+
+msgr:
+  name: base types
+  desc: this messenger only supports the built-in types, and has no custom messages
+
+protos:
+  - name: all_base_types
+    desc: write all base types, then read them back
+    msgs:
+      # LEGEND: `m` is either 'w' (write) or 'r' (read)
+      # m type        var name
+      # ----------------------------------------------------
+      - w i8          i8
+      - w u8          u8
+      - w i8_list     i8_list
+      - w u8_list     u8_list
+      - w i16         i16
+      - w u16         u16
+      - w i16_list    i16_list
+      - w u16_list    u16_list
+      - w i32         i32
+      - w u32         u32
+      - w i32_list    i32_list
+      - w u32_list    u32_list
+      - w i64         i64
+      - w u64         u64
+      - w i64_list    i64_list
+      - w u64_list    u64_list
+      - w float       float
+      - w float_list  float_list
+      - w double      double
+      - w double_list double_list
+      - w str         str
+      - w str_list    str_list
+```
+
   [ruby-lang]: https://www.ruby-lang.org/
   [gdscript]: https://docs.godotengine.org/en/stable/getting_started/scripting/gdscript/gdscript_basics.html
   [generals.io]: https://generals.io/
