@@ -105,6 +105,24 @@ module Nmspec
         code
       end
 
+      def _type_reader_writer_methods(type, num_bytes, pack_type=nil)
+        code = []
+
+        send_contents = pack_type ?  "([#{type}].pack('#{pack_type}'), 0)" : "(#{type}, 0)"
+        recv_contents = pack_type ? "(#{num_bytes}).unpack('#{pack_type}')" : "(#{num_bytes})"
+
+        code << "  def r_#{type}"
+        code << "    @socket.recv#{recv_contents}.first"
+        code << '  end'
+        code << ''
+        code << "  def w_#{type}(#{type})"
+        code << "    @socket.send#{send_contents}"
+        code << '  end'
+        code << ''
+
+        code
+      end
+
       def _str_types
         code = []
 
@@ -114,9 +132,7 @@ module Nmspec
         code << ''
         code << "  def r_str"
         code << "    bytes = @socket.recv(2).unpack('S>').first"
-        code << "    str = @socket.recv(bytes)"
-        code << ''
-        code << "    [str]"
+        code << "    @socket.recv(bytes)"
         code << '  end'
         code << ''
         code << "  def w_str(str)"
@@ -134,7 +150,7 @@ module Nmspec
         code << "      strings << @socket.recv(str_length)"
         code << '    end'
         code << ''
-        code << '    [strings]'
+        code << '    strings'
         code << '  end'
         code << ''
         code << "  def w_str_list(str_list)"
@@ -194,7 +210,6 @@ module Nmspec
         recv_contents = pack_type ? "(#{num_bytes} * #{type}.length).unpack('#{pack_type}*')" : "(#{num_bytes})"
 
         code << "  def r_#{type}"
-        code << "    puts \"\#{Process.pid} reading #{type} ...\""
         code << "    list_len = @socket.recv(2).unpack('S>').first"
         code << "    @socket.recv(list_len * #{num_bytes}).unpack('#{pack_type}*')"
         code << '  end'
@@ -202,27 +217,8 @@ module Nmspec
         code << "  def w_#{type}(#{type})"
         code << "    raise \"Cannot send #{type} longer than 16k elements\" if #{type}.length > 2**16"
         code << ''
-        code << "    puts \"\#{Process.pid} writing #{type} ...\""
         code << "    @socket.send([#{type}.length].pack('S>'), 0)"
-        code << "    #{type}.each{|e| @socket.send([e].pack('#{pack_type}*'), 0) }"
-        code << '  end'
-        code << ''
-
-        code
-      end
-
-      def _type_reader_writer_methods(type, num_bytes, pack_type=nil)
-        code = []
-
-        send_contents = pack_type ?  "([#{type}].pack('#{pack_type}'), 0)" : "(#{type}, 0)"
-        recv_contents = pack_type ? "(#{num_bytes}).unpack('#{pack_type}')" : "(#{num_bytes})"
-
-        code << "  def r_#{type}"
-        code << "    @socket.recv#{recv_contents}"
-        code << '  end'
-        code << ''
-        code << "  def w_#{type}(#{type})"
-        code << "    @socket.send#{send_contents}"
+        code << "    @socket.send(#{type}.pack('#{pack_type}*'), 0)"
         code << '  end'
         code << ''
 

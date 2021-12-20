@@ -137,7 +137,6 @@ module Nmspec
       end
 
       def to_ruby(spec)
-        puts "SPEC: #{spec}"
         ::Nmspec::Ruby.gen(spec)
       rescue
         ''
