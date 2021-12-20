@@ -271,6 +271,38 @@ module Nmspec
           code << _proto_method('recv', proto, protos, recv_local_vars, recv_passed_params, proto_code)
         end
 
+        if protos && protos.length > 0
+          code << ''
+          code << '  # This method is used when you\'re receiving protocol messages'
+          code << '  # in an unknown order, and dispatching automatically.'
+          code << '  #'
+          code << "  # NOTE: while you can pass parameters into this method, if you know the"
+          code << "  #       inputs to what you want to receive then you probably know what"
+          code << "  #       messages you are getting. In that case, explicit recv_* method calls"
+          code << "  #       are preferred, if possible. However, this method can be very"
+          code << "  #       effective for streaming in read-only protocol messages."
+          code << '  def recv_any(params=[])'
+          code << "    case @socket.recv(1).unpack('C').first"
+
+          protos&.each_with_index do |proto, proto_code|
+            code << "    when #{proto_code} then [#{proto_code}, recv_#{proto['name']}(*params)]"
+          end
+
+          code << '    end'
+          code << '  end'
+
+          code << ''
+          code << '  def send_any(proto_code, params=[])'
+          code << '    case proto_code'
+
+          protos&.each_with_index do |proto, proto_code|
+            code << "    when #{proto_code} then send_#{proto['name']}(*params)"
+          end
+
+          code << '    end'
+          code << '  end'
+        end
+
         code
       end
       ##

@@ -17,17 +17,30 @@ class TestBaseTypes < Minitest::Test
       loop do
         client = tcp_server.accept
         msgr = BaseTypesMsgr.new(client)
-        client.recv(1) # read and discard msg_code
-        recv_data = msgr.recv_all_base_types
-        msgr.send_all_base_types(*recv_data)
-        client.close
+        proto_code, recv_data = msgr.recv_any
+        msgr.send_any(proto_code, recv_data)
       end
     }
 
     Process.detach(@server)
+
+    # Client socket
+    conn_tries = 0
+    @conn = loop do
+              begin
+                break TCPSocket.new('localhost', TEST_PORT)
+              rescue
+                break 'Failed to connect' if conn_tries == 3
+                conn_tries += 1
+                sleep 0.5
+              end
+            end
+
+    @client_msgr = BaseTypesMsgr.new(@conn)
   end
 
   def teardown
+    @conn.close
     Process.kill 'HUP', @server
   end
 
@@ -57,21 +70,9 @@ class TestBaseTypes < Minitest::Test
       ['test string 1', 'test string 2', 'test string 3']
     ]
 
-    conn_tries = 0
-    s = loop do
-          begin
-            break TCPSocket.new('localhost', TEST_PORT)
-          rescue
-            break 'Failed to connect' if conn_tries == 3
-            conn_tries += 1
-            sleep 0.5
-          end
-        end
-
-    msgr = BaseTypesMsgr.new(s)
-    msgr.send_all_base_types(*send_data)
-    s.recv(1) # read and discard msg_code
-    recv_data = msgr.recv_all_base_types
+    @client_msgr.send_all_base_types(*send_data)
+    @conn.recv(1) # read and discard msg_code
+    recv_data = @client_msgr.recv_all_base_types
 
     assert_equal(send_data, recv_data)
   end
