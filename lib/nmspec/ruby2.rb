@@ -4,7 +4,7 @@ require 'set'
 module Nmspec
   module Ruby2
     class << self
-      def gen(spec)
+      def gen(spec, spec_hash)
         code = []
         code << '##'
         code << '# NOTE: this code is auto-generated from an nmspec file'
