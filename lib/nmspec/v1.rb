@@ -41,16 +41,18 @@ module Nmspec
         raise "invalid output language(s): [#{opts['langs'].select{|l| !SUPPORTED_OUTPUT_LANGS.include?(l) }.join(', ') }] - valid options are [#{SUPPORTED_OUTPUT_LANGS.map{|l| "\"#{l}\"" }.join(', ')}]" unless opts['langs'].all?{|l| SUPPORTED_OUTPUT_LANGS.include?(l) }
         raise "invalid spec YAML, check format" unless YAML.load(opts['spec']).is_a?(Hash)
 
-        spec = YAML.load(opts['spec'])
+        raw_spec = YAML.load(opts['spec'])
         langs = opts['langs']
 
-        raise "spec failed to parse as valid YAML" unless spec
+        raise "spec failed to parse as valid YAML" unless raw_spec
 
-        valid = Nmspec::V1.valid?(spec)
-        errors = Nmspec::V1.errors(spec)
-        warnings = Nmspec::V1.warnings(spec)
+        valid = Nmspec::V1.valid?(raw_spec)
+        errors = Nmspec::V1.errors(raw_spec)
+        warnings = Nmspec::V1.warnings(raw_spec)
+
+        spec_hash = Nmspec::Parser.parse(raw_spec)
         code = langs.each_with_object({}) do |lang, hash|
-          hash[lang] = send("to_#{lang}", spec)
+          hash[lang] = send("to_#{lang}", spec_hash)
           hash
         end
 
@@ -62,31 +64,31 @@ module Nmspec
         }
       end
 
-      def errors(spec)
+      def errors(raw_spec)
         [].tap do |errors|
           ##
           # main keys
           REQ_KEYS.each do |k|
-            errors << "required key `#{k}` is missing" unless spec.has_key?(k)
+            errors << "required key `#{k}` is missing" unless raw_spec.has_key?(k)
           end
 
-          unsupported_keys = spec.keys - REQ_KEYS - OPT_KEYS
+          unsupported_keys = raw_spec.keys - REQ_KEYS - OPT_KEYS
           errors << "spec contains unsupported keys: [#{unsupported_keys.join(', ')}]" unless unsupported_keys.empty?
 
           ##
           # msgr validation
-          errors << "invalid msgr name" unless _valid_msgr_name?(spec['msgr'])
-          errors << 'msgr is missing a name' unless spec['msgr'].is_a?(Hash) && spec['msgr'].has_key?('name')
+          errors << "invalid msgr name" unless _valid_msgr_name?(raw_spec['msgr'])
+          errors << 'msgr is missing a name' unless raw_spec['msgr'].is_a?(Hash) && raw_spec['msgr'].has_key?('name')
 
           ##
           # version check
-          errors << "unsupported spec version: `#{spec['version']}`" unless SUPPORTED_SPEC_VERSIONS.include?(spec['version'])
-          errors << "spec version must be a number" unless spec['version'].is_a?(Integer)
+          errors << "unsupported spec version: `#{raw_spec['version']}`" unless SUPPORTED_SPEC_VERSIONS.include?(raw_spec['version'])
+          errors << "spec version must be a number" unless raw_spec['version'].is_a?(Integer)
 
           ##
           # type validation
           all_types = BASE_TYPES.dup
-          spec['types']&.each do |name, type|
+          raw_spec['types']&.each do |name, type|
             errors << "invalid type name `#{name}`" unless name =~ IDENTIFIER_PATTERN
             if _valid_type?(type, all_types)
               all_types << name
@@ -97,7 +99,7 @@ module Nmspec
 
           ##
           # msg validation
-          protos = spec['protos']
+          protos = raw_spec['protos']
           protos&.each do |proto|
             errors << "invalid msg name `#{proto['name']}`" unless proto['name'] =~ IDENTIFIER_PATTERN
             errors << "protocol `#{proto['name']}` has no msgs" if proto['msgs']&.empty?
@@ -121,27 +123,27 @@ module Nmspec
         end
       end
 
-      def warnings(spec)
+      def warnings(raw_spec)
         [].tap do |warnings|
-          warnings << 'msgr is missing a description' unless spec['msgr'].is_a?(Hash) && spec['msgr'].has_key?('desc')
+          warnings << 'msgr is missing a description' unless raw_spec['msgr'].is_a?(Hash) && raw_spec['msgr'].has_key?('desc')
 
-          spec['protos']&.each do |proto|
+          raw_spec['protos']&.each do |proto|
             warnings << "msg `#{proto['name']}` is missing a description" unless proto.has_key?('desc')
           end
         end
       end
 
-      def valid?(spec)
-        errors(spec).empty?
+      def valid?(raw_spec)
+        errors(raw_spec).empty?
       end
 
-      def to_ruby(spec)
-        ::Nmspec::Ruby.gen(spec)
+      def to_ruby(spec_hash)
+        ::Nmspec::Ruby2.gen(spec_hash)
       rescue
         ''
       end
 
-      def to_gdscript
+      def to_gdscript(spec_hash)
       rescue
         ''
       end
