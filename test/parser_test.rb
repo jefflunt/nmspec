@@ -12,7 +12,7 @@ class TestParser < Minitest::Test
       {
         version: 1,
         msgr: {
-          name: 'basic',
+          name: 'minimal',
           desc: 'this messenger only supports the built-in types, and has no custom protocols',
         },
         types: [
@@ -139,7 +139,7 @@ class TestParser < Minitest::Test
         version: 1,
         msgr: {
           name: 'base types',
-          desc: 'this messenger includes a single protocol that is used to test reading/writing of all base types'
+          desc: 'this messenger supports the built-in types, and is mainly used for testing code generators'
         },
         types: [
           {

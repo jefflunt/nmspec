@@ -9,12 +9,12 @@ module Nmspec
         code << '##'
         code << '# NOTE: this code is auto-generated from an nmspec file'
 
-        if spec['msgr']['desc']
+        if spec.dig(:msgr, :desc)
           code << '#'
-          code << "# #{spec['msgr']['desc']}"
+          code << "# #{spec.dig(:msgr, :desc)}"
         end
 
-        code << "class #{_class_name_from_mod(spec['msgr'])}"
+        code << "class #{_class_name_from_msgr_name(spec.dig(:msgr, :name))}"
 
         code << _constructor
         code << ''
@@ -22,13 +22,9 @@ module Nmspec
         code << _str_types
         code << _list_types
 
-        types = spec['types']
-        if types
-          code << _subtype_aliases(types)
-          code << '' if types.length > 0
-        end
-
-        code << _protos_methods(spec['protos'])
+        types = spec[:types]
+        code << _subtype_aliases(types)
+        code << _protos_methods(spec[:protos])
 
         code << "end"
 
@@ -38,9 +34,10 @@ module Nmspec
         puts e.backtrace.join("\n  ")
       end
 
-      def _class_name_from_mod(mod)
-        mod['name']
+      def _class_name_from_msgr_name(name)
+        name
           .downcase
+          .gsub(/[\._\-]/, ' ')
           .split(' ')
           .map{|part| part.capitalize}
           .join + 'Msgr'
@@ -55,15 +52,17 @@ module Nmspec
       end
 
       def _subtype_aliases(types)
+        return unless types.detect{|t| !t[:base_type].nil? }
         code = []
 
         code << '  ###########################################'
         code << '  # subtype aliases'
         code << '  ###########################################'
         code << ''
-        types.each do |subtype, basetype|
-          code << "  alias_method :r_#{subtype}, :r_#{basetype}"
-          code << "  alias_method :w_#{subtype}, :w_#{basetype}"
+        types.each do |type_hash|
+          next unless type_hash[:base_type]
+          code << "  alias_method :r_#{type_hash[:name]}, :r_#{type_hash[:base_type]}"
+          code << "  alias_method :w_#{type_hash[:name]}, :w_#{type_hash[:base_type]}"
         end
 
         code
@@ -227,7 +226,7 @@ module Nmspec
 
       ##
       # builds all msg methods
-      def _protos_methods(protos)
+      def _protos_methods(protos=[])
         code = []
 
         return code unless protos && protos&.length > 0
@@ -236,25 +235,28 @@ module Nmspec
         code << '  # messages'
         code << '  ###########################################'
 
-        protos&.each_with_index do |proto, proto_code|
+        protos.each_with_index do |proto, proto_code|
           # This figures out which identifiers mentioned in the msg
           # definition must be passed in vs. declared within the method
 
-          next unless proto.has_key?('msgs') && !proto['msgs'].empty?
+          next unless proto.has_key?(:msgs) && !proto[:msgs].empty?
 
           code << ''
           send_local_vars = []
           recv_local_vars = []
-          send_passed_params, recv_passed_params = proto['msgs']
+          send_passed_params, recv_passed_params = proto[:msgs]
             .inject([Set.new, Set.new]) do |all_params, msg|
               send_params, recv_params = all_params
-              mode, type, identifier = msg.split
+
+              mode = msg[:mode]
+              type = msg[:type]
+              identifier = msg[:identifier]
 
               case mode
-              when 'r'
+              when :read
                 send_local_vars << [type, identifier]
                 recv_params << identifier unless recv_local_vars.map{|v| v.last}.include?(identifier)
-              when 'w'
+              when :write
                 recv_local_vars << [type, identifier]
                 send_params << identifier unless send_local_vars.map{|v| v.last}.include?(identifier)
               else
@@ -266,12 +268,12 @@ module Nmspec
 
           ##
           # send
-          code << _proto_method('send', proto, protos, send_local_vars, send_passed_params, proto_code)
+          code << _proto_method('send', proto_code, proto, send_local_vars, send_passed_params)
           code << ''
-          code << _proto_method('recv', proto, protos, recv_local_vars, recv_passed_params, proto_code)
+          code << _proto_method('recv', proto_code, proto, recv_local_vars, recv_passed_params)
         end
 
-        if protos && protos.length > 0
+        if protos.length > 0
           code << ''
           code << '  # This method is used when you\'re receiving protocol messages'
           code << '  # in an unknown order, and dispatching automatically.'
@@ -284,8 +286,8 @@ module Nmspec
           code << '  def recv_any(params=[])'
           code << "    case @socket.recv(1).unpack('C').first"
 
-          protos&.each_with_index do |proto, proto_code|
-            code << "    when #{proto_code} then [#{proto_code}, recv_#{proto['name']}(*params)]"
+          protos.each_with_index do |proto, proto_code|
+            code << "    when #{proto_code} then [#{proto_code}, recv_#{proto[:name]}(*params)]"
           end
 
           code << '    end'
@@ -295,8 +297,8 @@ module Nmspec
           code << '  def send_any(proto_code, params=[])'
           code << '    case proto_code'
 
-          protos&.each_with_index do |proto, proto_code|
-            code << "    when #{proto_code} then send_#{proto['name']}(*params)"
+          protos.each_with_index do |proto, proto_code|
+            code << "    when #{proto_code} then send_#{proto[:name]}(*params)"
           end
 
           code << '    end'
@@ -307,10 +309,10 @@ module Nmspec
       end
       ##
       # Builds a single protocol method
-      def _proto_method(kind, proto, protos, local_vars, passed_params, proto_code)
+      def _proto_method(kind, proto_code, proto, local_vars, passed_params)
         code = []
 
-        code << "  # #{proto['desc']}" if proto['desc']
+        code << "  # #{proto[:desc]}" if proto[:desc]
         unless local_vars.empty?
           code << '  #'
           code << '  # returns:  (type | local var name)'
@@ -319,9 +321,9 @@ module Nmspec
           code << '  # ]'
         end
 
-        code << "  def #{kind}_#{proto['name']}#{passed_params.length > 0 ? "(#{(passed_params.to_a).join(', ')})" : ''}"
+        code << "  def #{kind}_#{proto[:name]}#{passed_params.length > 0 ? "(#{(passed_params.to_a).join(', ')})" : ''}"
 
-        msgs = proto['msgs']
+        msgs = proto[:msgs]
         code << "    w_i8(#{proto_code})" if kind.eql?('send')
         msgs.each do |msg|
           msg = kind.eql?('send') ? msg : _flip_mode(msg)
@@ -334,17 +336,19 @@ module Nmspec
       end
 
       def _flip_mode(msg)
-        mode, type, identifier = msg.split(' ')
-        "#{mode == 'r' ? 'w' : 'r'} #{type} #{identifier}"
+        opposite_mode = msg[:mode] == :read ? :write : :read
+        { mode: opposite_mode, type: msg[:type], identifier: msg[:identifier] }
       end
 
       def _line_from_msg(msg)
-        mode, type, identifier = msg.split(' ')
+        mode = msg[:mode]
+        type = msg[:type]
+        identifier = msg[:identifier]
 
         case mode
-        when 'r'
+        when :read
           "#{"#{identifier} = " if identifier}r_#{type}"
-        when 'w'
+        when :write
           "w_#{type}(#{identifier})"
         else
           raise "Unsupported message msg mode: `#{mode}`"

@@ -138,7 +138,7 @@ module Nmspec
       end
 
       def to_ruby(spec_hash)
-        ::Nmspec::Ruby2.gen(spec_hash)
+        ::Nmspec::Ruby.gen(spec_hash)
       rescue
         ''
       end
