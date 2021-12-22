@@ -59,7 +59,7 @@ $ irb
 => true
  > pp  Nmspec::V1.gen({
          'spec' => IO.read('generals.io.nmspec'),
-         'langs' => ['ruby']
+         'langs' => ['ruby', 'gdscript']
        })
 => {
      "valid"=>true,
