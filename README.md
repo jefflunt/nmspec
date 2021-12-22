@@ -15,18 +15,18 @@ something in the network code I had to:
 
 My approach to making this constantly shifting communication easier to develop
 and debug was to come up with a language-agnostic representation of the mini
-network protocols within the game, specify those in some kind of easily editable
+network protocols within the game, specify in some kind of easily editable
 configuration language, and then generate both the Ruby and GDScript code from
 that central source. I figured that if I could do that without too much work,
 then I could also squash the client/server syncing bugs in one place (in the
 protocol specification language, and related output code generators). Then if I
 wanted to add a new message / protocol to either the client or server side I
 could build it once - in the specification language - and have a program spit
-out working code.
+out working code for both the client and server.
 
 Of course that's not all there is to successful network communication, but the
-bulk of bugs I was running into were at this low-level networking layer where
-the fine details on the client/server sides were slipping out of sync
+bulk of bugs I've been running into were at this low-level networking layer
+where the fine details of the client/server code were slipping out of sync
 constantly, and little typos could lead to big debugging time sinks.
 
 # Output language support
