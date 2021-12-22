@@ -1,5 +1,5 @@
 version: 1
 
 msgr:
-  name: basic
+  name: minimal
   desc: this messenger only supports the built-in types, and has no custom protocols

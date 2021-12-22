@@ -129,7 +129,7 @@ to get a basic messenger working.
 version: 1
 
 msgr:
-  name: basic
+  name: minimal
   desc: this messenger only supports the built-in types, and has no custom protocols
 ```
 
@@ -141,11 +141,11 @@ version: 1
 
 msgr:
   name: base types
-  desc: this messenger only supports the built-in types, and has no custom messages
+  desc: this messenger supports the built-in types, and is mainly used for testing code generators
 
 protos:
   - name: all_base_types
-    desc: write all base types, then read them back
+    desc: write all base types
     msgs:
       # LEGEND: `m` is either 'w' (write) or 'r' (read)
       # m type        var name
