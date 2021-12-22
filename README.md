@@ -13,9 +13,9 @@ something in the network code I had to:
 2. Change it on the client side in a different programming language
 3. Debug across the network connection to figure out where bugs were
 
-My approach to making this constantly shifting communication easier to develop
-and debug was to come up with a language-agnostic representation of the mini
-network protocols within the game, specify in some kind of easily editable
+My approach to making this constantly-shifting communication easier to develop
+and debug was to come up with a language-agnostic representation of the network
+protocols within the game, specifically in some kind of easily editable
 configuration language, and then generate both the Ruby and GDScript code from
 that central source. I figured that if I could do that without too much work,
 then I could also squash the client/server syncing bugs in one place (in the
@@ -41,12 +41,12 @@ Additional languages can be added if there is interest. I'm mainly building this
 for my own purposes, so if I'm the only person who ever uses it, that's fine
 too. :)
 
-I think it would be fun to eventuall connect this gem to the internet, allowing
-a static website to generate client/server code from a specification in a web
-form similar to how you can paste JSON into
+I think it would be fun to eventually connect this gem to the internet,
+allowing [a static website](http://nmspec.com/) to generate client/server code
+from a specification in a web form, similar to how you can paste JSON into
 [jsonlint.com](https://jsonlint.com/) and have it validate it for you without
 you needing to install a local linting tool. We'll see - I might need a break
-from network code some day soon, and if so, maybe I'll do that.
+from network code some day soon, and if so, maybe I'll set that up.
 
 # Sample usage
 
