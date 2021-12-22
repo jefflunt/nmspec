@@ -140,12 +140,13 @@ module Nmspec
       def to_ruby(spec_hash)
         ::Nmspec::Ruby.gen(spec_hash)
       rescue
-        ''
+        'codegen failure'
       end
 
       def to_gdscript(spec_hash)
+        ::Nmspec::GDScript.gen(spec_hash)
       rescue
-        ''
+        'codegen failure'
       end
 
       def _valid_type?(type, all_types)

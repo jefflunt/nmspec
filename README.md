@@ -35,7 +35,7 @@ As a starting point this gem will support network messengers in these two
 languages:
 
 * [Ruby 3.0.x][ruby-lang]
-* [GDScript 3.4][gdscript]
+* [GDScript 3.4.stable][gdscript]
 
 Additional languages can be added if there is interest. I'm mainly building this
 for my own purposes, so if I'm the only person who ever uses it, that's fine
