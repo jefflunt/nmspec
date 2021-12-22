@@ -3,13 +3,50 @@
 the format of communication protocols between two sides of a network
 connection.
 
+I started working on this gem because of a specific challenge I was facing. I've
+been working on an online game with a server backend (written in Ruby) and a
+game client (created with the game engine, Godot, and its embedded scripting
+language, GDScript). The challenge I kept running into was that anytime I change
+something in the network code I had to:
+
+1. Change it on the server side in one programming language
+2. Change it on the client side in a different programming language
+3. Debug across the network connection to figure out where bugs were
+
+My approach to making this constantly shifting communication easier to develop
+and debug was to come up with a language-agnostic representation of the mini
+network protocols within the game, specify those in some kind of easily editable
+configuration language, and then generate both the Ruby and GDScript code from
+that central source. I figured that if I could do that without too much work,
+then I could also squash the client/server syncing bugs in one place (in the
+protocol specification language, and related output code generators). Then if I
+wanted to add a new message / protocol to either the client or server side I
+could build it once - in the specification language - and have a program spit
+out working code.
+
+Of course that's not all there is to successful network communication, but the
+bulk of bugs I was running into were at this low-level networking layer where
+the fine details on the client/server sides were slipping out of sync
+constantly, and little typos could lead to big debugging time sinks.
+
+# Output language support
+
 As a starting point this gem will support network messengers in these two
 languages:
 
 * [Ruby 3.0.x][ruby-lang]
 * [GDScript 3.4][gdscript]
 
-Additional languages can be added if there is interest.
+Additional languages can be added if there is interest. I'm mainly building this
+for my own purposes, so if I'm the only person who ever uses it, that's fine
+too. :)
+
+I think it would be fun to eventuall connect this gem to the internet, allowing
+a static website to generate client/server code from a specification in a web
+form similar to how you can paste JSON into
+[jsonlint.com](https://jsonlint.com/) and have it validate it for you without
+you needing to install a local linting tool. We'll see - I might need a break
+from network code some day soon, and if so, maybe I'll do that.
 
 # Sample usage
 
