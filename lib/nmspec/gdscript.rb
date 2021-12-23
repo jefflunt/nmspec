@@ -52,7 +52,7 @@ module Nmspec
         code = []
 
         code << 'func set_socket(s):'
-        code << '  socket = s'
+        code << "\tsocket = s"
 
         code
       end
@@ -82,22 +82,22 @@ module Nmspec
             code << _type_list_reader_writer_methods(type, num_bits)
           end
 
-        code << 'func r_str_list():'
-        code << '  var n = socket.get_u16()'
-        code << '  var strings = []'
-        code << ''
-        code << '  for i in range(n):'
-        code << '    strings.append(socket.get_string(socket.get_u16()))'
-        code << ''
-        code << '  return strings'
-        code << ''
-        code << 'func w_str_list(strings):'
-        code << '  var n = strings.size()'
-        code << '  socket.put_u16(strings.size())'
-        code << ''
-        code << '  for i in range(n):'
-        code << '    socket.put_u16(strings[i].length())'
-        code << '    socket.put_str(strings[i])'
+        code << "func r_str_list():"
+        code << "\tvar n = socket.get_u16()"
+        code << "\tvar strings = []"
+        code << ""
+        code << "\tfor _i in range(n):"
+        code << "\t\tstrings.append(socket.get_string(socket.get_u16()))"
+        code << ""
+        code << "\treturn strings"
+        code << ""
+        code << "func w_str_list(strings):"
+        code << "\tvar n = strings.size()"
+        code << "\tsocket.put_u16(strings.size())"
+        code << ""
+        code << "\tfor i in range(n):"
+        code << "\t\tsocket.put_u16(strings[i].length())"
+        code << "\t\tsocket.put_str(strings[i])"
 
         code
       end
@@ -106,22 +106,21 @@ module Nmspec
         code = []
 
         code << "func r_#{type}():"
-        code << '  var n = socket.get_u16()'
-        code << '  var arr = []'
-        code << ''
-        code << '  for i in range(n):'
-        code << "    arr.append(socket.get_#{num_bits}()"
-        code << ''
-        code << '  return arr'
-        code << ''
+        code << "\tvar n = socket.get_u16()"
+        code << "\tvar arr = []"
+        code << ""
+        code << "\tfor _i in range(n):"
+        code << "\t\tarr.append(socket.get_#{num_bits}())"
+        code << ""
+        code << "\treturn arr"
+        code << ""
         code << "func w_#{type}(#{type}):"
-        code << "  var n = #{type}.size()"
-        code << '  socket.put_u16(n)'
-        code << ''
-        code << '  for i in range(n):'
-        code << "    socket.put_#{type.split('_list').first}(#{type}[i])"
-        code << ''
-
+        code << "\tvar n = #{type}.size()"
+        code << "\tsocket.put_u16(n)"
+        code << ""
+        code << "\tfor i in range(n):"
+        code << "\t\tsocket.put_#{type.split('_list').first}(#{type}[i])"
+        code << ""
         code
       end
 
@@ -147,7 +146,9 @@ module Nmspec
           send_local_vars = []
           recv_local_vars = []
           send_passed_params, recv_passed_params = proto[:msgs]
-            .inject([Set.new, Set.new]) do |all_params, msg|
+            .inject([[], []]) do |all_params, msg|
+              msg[:type] = _replace_reserved_word(msg[:type])
+              msg[:identifier] = _replace_reserved_word(msg[:identifier])
               send_params, recv_params = all_params
 
               mode = msg[:mode]
@@ -165,7 +166,7 @@ module Nmspec
                 raise "Unsupported mode: `#{mode}`"
               end
 
-              [send_params, recv_params]
+              [send_params.uniq, recv_params.uniq]
             end
 
           ##
@@ -176,6 +177,15 @@ module Nmspec
         end
 
         code
+      end
+
+      def _replace_reserved_word(word)
+        case word
+        when 'float' then 'flt'
+        when 'str'   then 'string'
+        else
+          word
+        end
       end
 
       ##
@@ -195,12 +205,13 @@ module Nmspec
         code << "func #{kind}_#{proto[:name]}#{passed_params.length > 0 ? "(#{(passed_params.to_a).join(', ')})" : '()'}:"
 
         msgs = proto[:msgs]
-        code << "  socket.put_8(#{proto_code})" if kind.eql?('send')
+        code << "\tsocket.put_8(#{proto_code})" if kind.eql?('send')
         msgs.each do |msg|
           msg = kind.eql?('send') ? msg : _flip_mode(msg)
-          code << "  #{_line_from_msg(msg)}"
+          code << "\t#{_line_from_msg(msg)}"
         end
-        code << "\n  return [#{local_vars.map{|v| v.last }.uniq.join(', ')}]" unless local_vars.empty?
+        code << ''
+        code << "\treturn [#{local_vars.map{|v| v.last }.uniq.join(', ')}]" unless local_vars.empty?
 
         code
       end
