@@ -324,7 +324,7 @@ module Nmspec
         code << "  def #{kind}_#{proto[:name]}#{passed_params.length > 0 ? "(#{(passed_params.to_a).join(', ')})" : ''}"
 
         msgs = proto[:msgs]
-        code << "    w_i8(#{proto_code})" if kind.eql?('send')
+        code << "    w_u8(#{proto_code})" if kind.eql?('send')
         msgs.each do |msg|
           msg = kind.eql?('send') ? msg : _flip_mode(msg)
           code << "    #{_line_from_msg(msg)}"

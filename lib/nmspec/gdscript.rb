@@ -105,6 +105,7 @@ module Nmspec
       def _type_list_reader_writer_methods(type, num_bits)
         code = []
 
+        type = type.start_with?('i') ? type[1..] : type
         code << "func r_#{type}():"
         code << "\tvar n = socket.get_u16()"
         code << "\tvar arr = []"
@@ -205,7 +206,7 @@ module Nmspec
         code << "func #{kind}_#{proto[:name]}#{passed_params.length > 0 ? "(#{(passed_params.to_a).join(', ')})" : '()'}:"
 
         msgs = proto[:msgs]
-        code << "\tsocket.put_8(#{proto_code})" if kind.eql?('send')
+        code << "\tsocket.put_u8(#{proto_code})" if kind.eql?('send')
         msgs.each do |msg|
           msg = kind.eql?('send') ? msg : _flip_mode(msg)
           code << "\t#{_line_from_msg(msg)}"
@@ -225,6 +226,8 @@ module Nmspec
         mode = msg[:mode]
         type = msg[:type]
         identifier = msg[:identifier]
+
+        type = type.start_with?('i') ? type[1..] : type
 
         case mode
         when :read
