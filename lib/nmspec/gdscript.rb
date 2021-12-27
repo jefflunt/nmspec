@@ -17,8 +17,6 @@ module Nmspec
         code << ''
         code << 'extends Node'
         code << ''
-        code << "class_name #{_class_name_from_msgr_name(spec.dig(:msgr, :name))}"
-        code << ''
 
         code << '###########################################'
         code << '# setup'
@@ -105,7 +103,7 @@ module Nmspec
       def _type_list_reader_writer_methods(type, num_bits)
         code = []
 
-        type = type.start_with?('i') ? type[1..] : type
+        put_type = type.start_with?('i') ? type[1..] : type
         code << "func r_#{type}():"
         code << "\tvar n = socket.get_u16()"
         code << "\tvar arr = []"
@@ -120,7 +118,7 @@ module Nmspec
         code << "\tsocket.put_u16(n)"
         code << ""
         code << "\tfor i in range(n):"
-        code << "\t\tsocket.put_#{type.split('_list').first}(#{type}[i])"
+        code << "\t\tsocket.put_#{put_type.split('_list').first}(#{type}[i])"
         code << ""
         code
       end

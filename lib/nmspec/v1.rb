@@ -88,7 +88,9 @@ module Nmspec
           ##
           # type validation
           all_types = BASE_TYPES.dup
-          raw_spec['types']&.each do |name, type|
+          raw_spec['types']&.each do |type_spec|
+            type, name = type_spec.split
+
             errors << "invalid type name `#{name}`" unless name =~ IDENTIFIER_PATTERN
             if _valid_type?(type, all_types)
               all_types << name
