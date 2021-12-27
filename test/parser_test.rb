@@ -381,8 +381,8 @@ class TestParser < Minitest::Test
       {
         version: 1,
         msgr: {
-          name: 'generals io',
-          desc: 'a sample generals.io nmspec'
+          name: 'generals.io',
+          desc: 'demo nmspec file for generals.io'
         },
         types: [
           {
@@ -496,14 +496,19 @@ class TestParser < Minitest::Test
             kind: 'str_list',
           },
           {
-            name: 'player_name',
-            base_type: 'str',
-            kind: 'str',
+            name: 'player_id',
+            base_type: 'u8',
+            kind: 'numeric',
           },
           {
-            name: 'player_id',
-            base_type: 'i8',
+            name: 'serv_code',
+            base_type: 'u8',
             kind: 'numeric',
+          },
+          {
+            name: 'serv_msg',
+            base_type: 'str',
+            kind: 'str',
           },
           {
             name: 'tile_id',
@@ -515,25 +520,15 @@ class TestParser < Minitest::Test
             base_type: 'u8',
             kind: 'numeric',
           },
-          {
-            name: 'server_code',
-            base_type: 'u8',
-            kind: 'numeric',
-          },
-          {
-            name: 'server_msg',
-            base_type: 'str',
-            kind: 'str',
-          },
         ],
         protos: [
           {
             name: 'set_player_name',
-            desc: 'sets the player name for a given player',
+            desc: 'client message sets the player name for a given player',
             msgs: [
               {
                 mode: :write,
-                type: 'player_name',
+                type: 'str',
                 identifier: 'player_name',
               },
             ],
@@ -544,19 +539,19 @@ class TestParser < Minitest::Test
             msgs: [
               {
                 mode: :write,
-                type: 'server_code',
+                type: 'serv_code',
                 identifier: 'resp_code',
               },
               {
                 mode: :write,
-                type: 'server_msg',
+                type: 'serv_msg',
                 identifier: 'resp_msg',
               },
             ],
           },
           {
             name: 'set_player_id',
-            desc: 'server message to client to set id/color',
+            desc: 'server message to client to set player id/color',
             msgs: [
               {
                 mode: :write,
@@ -567,7 +562,7 @@ class TestParser < Minitest::Test
           },
           {
             name: 'player_move',
-            desc: 'player request to make a move',
+            desc: 'client message to server to make a player move',
             msgs: [
               {
                 mode: :write,
@@ -581,14 +576,14 @@ class TestParser < Minitest::Test
               },
               {
                 mode: :write,
-                type: 'i16',
+                type: 'u16',
                 identifier: 'armies',
               },
             ],
           },
           {
             name: 'set_tile',
-            desc: 'server updating client tiles',
+            desc: 'server message to client to set state of a tile',
             msgs: [
               {
                 mode: :write,
@@ -607,7 +602,7 @@ class TestParser < Minitest::Test
               },
               {
                 mode: :write,
-                type: 'i16',
+                type: 'u16',
                 identifier: 'armies',
               },
             ],

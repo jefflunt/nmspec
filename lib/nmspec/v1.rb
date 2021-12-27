@@ -1,4 +1,5 @@
 require 'yaml'
+require_relative './version.rb'
 
 module Nmspec
   module V1
@@ -31,15 +32,31 @@ module Nmspec
       #
       # Returns a hash with this format:
       def gen(opts)
-        raise "invalid opts (expecting Hash, got #{opts.class})" unless opts.is_a?(Hash)
-        raise "unexpected keys in nmspec: [#{(opts.keys - GEN_OPTS_KEYS).join(', ')}]" unless (opts.keys - GEN_OPTS_KEYS).empty?
-        raise '`spec` key mising from nmspec options' unless opts.has_key?('spec')
-        raise "invalid spec (expecting String, got #{opts['spec'].class})" unless opts['spec'].is_a?(String)
-        raise '`langs` key missing' unless opts.has_key?('langs')
-        raise 'list of output languages cannot be empty' if opts['langs'].empty?
-        raise "invalid list of output languages (expecting Array, got #{opts['langs'].class}" unless opts['langs'].is_a?(Array)
-        raise "invalid output language(s): [#{opts['langs'].select{|l| !SUPPORTED_OUTPUT_LANGS.include?(l) }.join(', ') }] - valid options are [#{SUPPORTED_OUTPUT_LANGS.map{|l| "\"#{l}\"" }.join(', ')}]" unless opts['langs'].all?{|l| SUPPORTED_OUTPUT_LANGS.include?(l) }
-        raise "invalid spec YAML, check format" unless YAML.load(opts['spec']).is_a?(Hash)
+        errors = []
+        warnings = []
+
+        errors << "invalid opts (expecting Hash, got #{opts.class})" unless opts.is_a?(Hash)
+        errors << "unexpected keys in nmspec: [#{(opts.keys - GEN_OPTS_KEYS).join(', ')}]" unless (opts.keys - GEN_OPTS_KEYS).empty?
+        errors << '`spec` key mising from nmspec options' unless opts.has_key?('spec')
+        errors << "invalid spec (expecting valid nmspec YAML)" unless opts.dig('spec').is_a?(String)
+        errors << '`langs` key missing' unless opts.has_key?('langs')
+        errors << 'list of output languages cannot be empty' if opts.dig('langs')&.empty?
+        errors << "invalid list of output languages (expecting array of strings)" unless opts.dig('langs').is_a?(Array) && opts.dig('langs').all?{|l| l.is_a?(String) }
+        errors << "invalid output language(s): [#{(opts.dig('langs') || []).select{|l| !SUPPORTED_OUTPUT_LANGS.include?(l) }.join(', ') }] - valid options are [#{SUPPORTED_OUTPUT_LANGS.map{|l| "\"#{l}\"" }.join(', ')}]" unless opts.dig('langs')&.all?{|l| SUPPORTED_OUTPUT_LANGS.include?(l) }
+
+        begin
+          YAML.load(opts['spec']).is_a?(Hash)
+        rescue TypeError
+          errors << "invalid nmspec YAML, check format"
+        end
+
+        return ({
+          'nmspec_lib_version' => NMSPEC_GEM_VERSION,
+          'valid' => false,
+          'errors' => errors,
+          'warnings' => warnings,
+          'code' => {}
+        }) unless errors.empty?
 
         raw_spec = YAML.load(opts['spec'])
         langs = opts['langs']
@@ -57,6 +74,7 @@ module Nmspec
         end
 
         {
+          'nmspec_lib_version' => NMSPEC_GEM_VERSION,
           'valid' => valid,
           'errors' => errors,
           'warnings' => warnings,
