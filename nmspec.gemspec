@@ -1,4 +1,4 @@
-require_relative './lib/nmspec/nmsepc_gem_version.rb'
+require_relative './lib/nmspec/version.rb'
 
 Gem::Specification.new do |s|
   s.name        = 'nmspec'
