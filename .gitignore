@@ -1,4 +1,5 @@
 .DS_Store
 .rbenv-gemsets/
-*.gem
 generated_code/
+*.gem
+*.zip
