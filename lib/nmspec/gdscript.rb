@@ -29,7 +29,8 @@ module Nmspec
         code << ''
         code << _list_types
 
-        code << _protos_methods(spec[:protos])
+        subtypes = spec[:types].select{|t| !t[:base_type].nil? }
+        code << _protos_methods(spec[:protos], subtypes)
 
         code.join("\n")
       rescue => e
@@ -125,7 +126,7 @@ module Nmspec
 
       ##
       # builds all msg methods
-      def _protos_methods(protos=[])
+      def _protos_methods(protos=[], subtypes=[])
         code = []
 
         return code unless protos && protos&.length > 0
@@ -170,9 +171,9 @@ module Nmspec
 
           ##
           # send
-          code << _proto_method('send', proto_code, proto, send_local_vars, send_passed_params)
+          code << _proto_method('send', proto_code, proto, send_local_vars, send_passed_params, subtypes)
           code << ''
-          code << _proto_method('recv', proto_code, proto, recv_local_vars, recv_passed_params)
+          code << _proto_method('recv', proto_code, proto, recv_local_vars, recv_passed_params, subtypes)
         end
 
         code
@@ -189,7 +190,7 @@ module Nmspec
 
       ##
       # Builds a single protocol method
-      def _proto_method(kind, proto_code, proto, local_vars, passed_params)
+      def _proto_method(kind, proto_code, proto, local_vars, passed_params, subtypes)
         code = []
 
         code << "# #{proto[:desc]}" if proto[:desc]
@@ -207,7 +208,7 @@ module Nmspec
         code << "\tsocket.put_u8(#{proto_code})" if kind.eql?('send')
         msgs.each do |msg|
           msg = kind.eql?('send') ? msg : _flip_mode(msg)
-          code << "\t#{_line_from_msg(msg)}"
+          code << "\t#{_line_from_msg(msg, subtypes)}"
         end
         code << ''
         code << "\treturn [#{local_vars.map{|v| v.last }.uniq.join(', ')}]" unless local_vars.empty?
@@ -220,9 +221,10 @@ module Nmspec
         { mode: opposite_mode, type: msg[:type], identifier: msg[:identifier] }
       end
 
-      def _line_from_msg(msg)
+      def _line_from_msg(msg, subtypes)
+        subtype = subtypes.detect{|st| st[:name] == msg[:type] }&.dig(:base_type)
         mode = msg[:mode]
-        type = msg[:type]
+        type = _replace_reserved_word(subtype || msg[:type])
         identifier = msg[:identifier]
 
         type = type.start_with?('i') ? type[1..] : type
