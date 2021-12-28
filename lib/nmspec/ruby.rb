@@ -130,7 +130,7 @@ module Nmspec
         code << '  ###########################################'
         code << ''
         code << "  def r_str"
-        code << "    bytes = @socket.recv(2).unpack('L>').first"
+        code << "    bytes = @socket.recv(4).unpack('L>').first"
         code << "    @socket.recv(bytes)"
         code << '  end'
         code << ''
@@ -142,8 +142,8 @@ module Nmspec
         code << "  def r_str_list"
         code << '    strings = []'
         code << ''
-        code << "    @socket.recv(2).unpack('L>').first.times do"
-        code << "      str_length = @socket.recv(2).unpack('L>').first"
+        code << "    @socket.recv(4).unpack('L>').first.times do"
+        code << "      str_length = @socket.recv(4).unpack('L>').first"
         code << "      strings << @socket.recv(str_length)"
         code << '    end'
         code << ''
@@ -204,7 +204,7 @@ module Nmspec
         recv_contents = pack_type ? "(#{num_bytes} * #{type}.length).unpack('#{pack_type}*')" : "(#{num_bytes})"
 
         code << "  def r_#{type}"
-        code << "    list_len = @socket.recv(2).unpack('L>').first"
+        code << "    list_len = @socket.recv(4).unpack('L>').first"
         code << "    @socket.recv(list_len * #{num_bytes}).unpack('#{pack_type}*')"
         code << '  end'
         code << ''
