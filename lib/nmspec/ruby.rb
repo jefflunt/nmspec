@@ -130,22 +130,20 @@ module Nmspec
         code << '  ###########################################'
         code << ''
         code << "  def r_str"
-        code << "    bytes = @socket.recv(2).unpack('S>').first"
+        code << "    bytes = @socket.recv(2).unpack('L>').first"
         code << "    @socket.recv(bytes)"
         code << '  end'
         code << ''
         code << "  def w_str(str)"
-        code << "    raise \"Cannot send string longer than 16k bytes\" if str.bytes.length > 2**16"
-        code << ''
-        code << "    @socket.send([str.length].pack('S>'), 0)"
+        code << "    @socket.send([str.length].pack('L>'), 0)"
         code << "    @socket.send(str, 0)"
         code << '  end'
         code << ''
         code << "  def r_str_list"
         code << '    strings = []'
         code << ''
-        code << "    @socket.recv(2).unpack('S>').first.times do"
-        code << "      str_length = @socket.recv(2).unpack('S>').first"
+        code << "    @socket.recv(2).unpack('L>').first.times do"
+        code << "      str_length = @socket.recv(2).unpack('L>').first"
         code << "      strings << @socket.recv(str_length)"
         code << '    end'
         code << ''
@@ -153,12 +151,9 @@ module Nmspec
         code << '  end'
         code << ''
         code << "  def w_str_list(str_list)"
-        code << "    raise \"Cannot send a string list with more than 16k string\" if str_list.length > 2**16"
-        code << "    raise \"Cannot send string longer than 16k bytes\" if str_list.map{|s| s.length }.max > 2**16"
-        code << ''
-        code << "    @socket.send([str_list.length].pack('S>'), 0)"
+        code << "    @socket.send([str_list.length].pack('L>'), 0)"
         code << '    str_list.each do |str|'
-        code << "      @socket.send([str.length].pack('S>'), 0)"
+        code << "      @socket.send([str.length].pack('L>'), 0)"
         code << "      @socket.send(str, 0)"
         code << '    end'
         code << '  end'
@@ -209,14 +204,12 @@ module Nmspec
         recv_contents = pack_type ? "(#{num_bytes} * #{type}.length).unpack('#{pack_type}*')" : "(#{num_bytes})"
 
         code << "  def r_#{type}"
-        code << "    list_len = @socket.recv(2).unpack('S>').first"
+        code << "    list_len = @socket.recv(2).unpack('L>').first"
         code << "    @socket.recv(list_len * #{num_bytes}).unpack('#{pack_type}*')"
         code << '  end'
         code << ''
         code << "  def w_#{type}(#{type})"
-        code << "    raise \"Cannot send #{type} longer than 16k elements\" if #{type}.length > 2**16"
-        code << ''
-        code << "    @socket.send([#{type}.length].pack('S>'), 0)"
+        code << "    @socket.send([#{type}.length].pack('L>'), 0)"
         code << "    @socket.send(#{type}.pack('#{pack_type}*'), 0)"
         code << '  end'
         code << ''

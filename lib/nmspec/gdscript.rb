@@ -20,12 +20,12 @@ module Nmspec
 
         code << '###########################################'
         code << '# setup'
-        code << '###########################################'
-        code << ''
         code << 'var socket = StreamPeerTCP.new()'
         code << ''
-        code << _socket_setter
+        code << _ready
+        code << ''
 
+        code << _str_types
         code << ''
         code << _list_types
 
@@ -47,11 +47,26 @@ module Nmspec
           .join + 'Msgr'
       end
 
-      def _socket_setter
+      def _ready
         code = []
 
-        code << 'func set_socket(s):'
-        code << "\tsocket = s"
+        code << 'func _ready():'
+        code << "\tsocket.set_big_endian(true)"
+
+        code
+      end
+
+      def _str_types
+        code = []
+
+        code << '###########################################'
+        code << '# string types'
+        code << "func r_str():"
+        code << "\treturn socket.get_data(socket.get_u32())[1].get_string_from_ascii()"
+        code << ""
+        code << "func w_str(string):"
+        code << "\tsocket.put_u32(string.length())"
+        code << "\tsocket.put_data(string.to_ascii())"
 
         code
       end
@@ -61,8 +76,6 @@ module Nmspec
 
         code << '###########################################'
         code << '# list types'
-        code << '###########################################'
-        code << ''
 
         ::Nmspec::V1::BASE_TYPES
           .each do |type|
@@ -82,21 +95,21 @@ module Nmspec
           end
 
         code << "func r_str_list():"
-        code << "\tvar n = socket.get_u16()"
+        code << "\tvar n = socket.get_u32()"
         code << "\tvar strings = []"
         code << ""
         code << "\tfor _i in range(n):"
-        code << "\t\tstrings.append(socket.get_string(socket.get_u16()))"
+        code << "\t\tstrings.append(socket.get_data(socket.get_u32())[1].get_string_from_ascii())"
         code << ""
         code << "\treturn strings"
         code << ""
         code << "func w_str_list(strings):"
         code << "\tvar n = strings.size()"
-        code << "\tsocket.put_u16(strings.size())"
+        code << "\tsocket.put_u32(strings.size())"
         code << ""
         code << "\tfor i in range(n):"
-        code << "\t\tsocket.put_u16(strings[i].length())"
-        code << "\t\tsocket.put_str(strings[i])"
+        code << "\t\tsocket.put_u32(strings[i].length())"
+        code << "\t\tsocket.w_str(strings[i])"
 
         code
       end
@@ -106,7 +119,7 @@ module Nmspec
 
         put_type = type.start_with?('i') ? type[1..] : type
         code << "func r_#{type}():"
-        code << "\tvar n = socket.get_u16()"
+        code << "\tvar n = socket.get_u32()"
         code << "\tvar arr = []"
         code << ""
         code << "\tfor _i in range(n):"
@@ -116,7 +129,7 @@ module Nmspec
         code << ""
         code << "func w_#{type}(#{type}):"
         code << "\tvar n = #{type}.size()"
-        code << "\tsocket.put_u16(n)"
+        code << "\tsocket.put_u32(n)"
         code << ""
         code << "\tfor i in range(n):"
         code << "\t\tsocket.put_#{put_type.split('_list').first}(#{type}[i])"
@@ -134,7 +147,6 @@ module Nmspec
         code << ''
         code << '###########################################'
         code << '# messages'
-        code << '###########################################'
 
         protos.each_with_index do |proto, proto_code|
           # This figures out which identifiers mentioned in the msg
@@ -234,6 +246,8 @@ module Nmspec
           case
           when type.end_with?('_list')
             "var #{identifier} = r_#{type}()"
+          when type.eql?('string')
+            "var #{identifier} = r_str()"
           else
             "var #{identifier} = socket.get_#{type}()"
           end
@@ -241,6 +255,8 @@ module Nmspec
           case
           when type.end_with?('_list')
             "w_#{type}(#{identifier})"
+          when type.eql?('string')
+            "w_str(#{identifier})"
           else
             "socket.put_#{type}(#{identifier})"
           end
