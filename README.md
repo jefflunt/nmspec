@@ -97,6 +97,8 @@ double  double_list         # signed double-precision 64-bit floating point numb
 str     str_list            # strings (arrays of bytes)
 ```
 
+As of this writing, all types are sent with big-endian encoding.
+
 `*_list` types are ordered lists of elements (i.e. arrays).
 
 There is no support for mixed-type list, mostly because socket libraries seem to
