@@ -1,7 +1,7 @@
 ---
-name: Custom issue template
-about: Describe this issue template's purpose here.
-title: Add language support for <language>
+name: Add output language support for <language>
+about: Submit this issue template if you'd like to see a new language added to nmspec
+title: Add output language support for <language>
 labels: lang-support
 assignees: jefflunt
 
