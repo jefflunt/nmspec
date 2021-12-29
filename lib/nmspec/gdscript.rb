@@ -20,9 +20,9 @@ module Nmspec
 
         code << '###########################################'
         code << '# setup'
-        code << 'var socket = StreamPeerTCP.new()'
+        code << 'var socket = null'
         code << ''
-        code << _ready
+        code << _init
         code << ''
 
         code << _str_types
@@ -47,10 +47,11 @@ module Nmspec
           .join + 'Msgr'
       end
 
-      def _ready
+      def _init
         code = []
 
-        code << 'func _ready():'
+        code << 'func _init(_socket):'
+        code << "\tsocket = _socket"
         code << "\tsocket.set_big_endian(true)"
 
         code

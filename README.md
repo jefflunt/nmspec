@@ -1,52 +1,56 @@
+# `nmspec`
 
-`nmspec` (network message specification) is a subset of YAML used to specify
-the format of communication protocols between two sides of a network
-connection.
+`nmspec` (network message specification) is a combination of binary
+serialization and network communication (two things that are usually treated
+separately), designed to make creating TCP protocols between two ends of a
+network connection easier to specify and keep consistent..
 
-I started working on this gem because of a specific challenge I was facing. I've
-been working on an online game with a server backend (written in Ruby) and a
-game client (created with the game engine, Godot, and its embedded scripting
-language, GDScript). The challenge I kept running into was that anytime I change
-something in the network code I had to:
+A centralized YAML file is used to describe the types and messages passed
+between network peers, and from that description TCP peer code (a "messenger")
+is generated in any supported output programming language. The messages
+described in `nmspec` are used to create both the reading and writing sides
+of the connection, so that a single source code file contains everything you
+need for a network peer, regardless of if it's the client or server.
 
-1. Change it on the server side in one programming language
-2. Change it on the client side in a different programming language
-3. Debug across the network connection to figure out where bugs were
+## Motivation
+
+`nmspec` was specifically created to help with with a problem I was facing,
+where I was designing some network peers in two different programming languages
+that needed to talk to each other, and I found that keeping the two sides in
+sync generated a lot of bugs that I thought might be avoided by centralizing the
+description of their communication protocols. Without this, what was happening
+regularly was:
+
+1. I would change something on the server side in one programming language
+2. I would change the same thing on the client side in a different programming
+   language
+3. The serialization of data on one side of the network would get out of sync
+   with the deserialization on the other side
+
+By describing the wire protocol in one place it was my hope that I would reduce
+the amount of time I spent on synchronization issues.
+
+## Results
 
 My approach to making this constantly-shifting communication easier to develop
 and debug was to come up with a language-agnostic representation of the network
 protocols within the game, specifically in some kind of easily editable
-configuration language, and then generate both the Ruby and GDScript code from
-that central source. I figured that if I could do that without too much work,
-then I could also squash the client/server syncing bugs in one place (in the
-protocol specification language, and related output code generators). Then if I
-wanted to add a new message / protocol to either the client or server side I
-could build it once - in the specification language - and have a program spit
-out working code for both the client and server.
+configuration language. YAML fits that description. I then integrated this
+tightly with TCP (a decent starting point).
 
-Of course that's not all there is to successful network communication, but the
-bulk of bugs I've been running into were at this low-level networking layer
-where the fine details of the client/server code were slipping out of sync
-constantly, and little typos could lead to big debugging time sinks.
+The code generators are written in Ruby, which is reasonably expressive for this
+purpose.
 
 # Output language support
 
-As a starting point this gem will support network messengers in these two
-languages:
+As a starting point this gem supports network messengers in these two languages:
 
 * [Ruby 3.0.x][ruby-lang]
 * [GDScript 3.4.stable][gdscript]
 
-Additional languages can be added if there is interest. I'm mainly building this
-for my own purposes, so if I'm the only person who ever uses it, that's fine
-too. :)
-
-I think it would be fun to eventually connect this gem to the internet,
-allowing [a static website](http://nmspec.com/) to generate client/server code
-from a specification in a web form, similar to how you can paste JSON into
-[jsonlint.com](https://jsonlint.com/) and have it validate it for you without
-you needing to install a local linting tool. We'll see - I might need a break
-from network code some day soon, and if so, maybe I'll set that up.
+`nmspec` came out of a online game project where the backend was written in
+Ruby, and the frontend build with the Godot game engine, which includes the
+embedded scripting language, GDSCript.
 
 # Sample usage
 
@@ -235,6 +239,26 @@ Output program code is generated in the following manner:
 5. The resulting output code in all requested languages is gathered together and
    returned to the user
 
+## Preliminary research, and comparison to other methods
+
+I started with researching how other people had designed network protocol
+description languages/tools in the past, beginning with [Prolac][prolac]. This
+lead me to other network messaging tools, binary serialization in general,
+finally [Google's protocol buffers][protobuffs]. Protocol buffers were probably
+the closest thing to what I wanted, and took care of binary
+serialization/deserialization, but weren't packaaged with the networking layer,
+which introduces additional considerations such as byte ordering, efficient
+packet construction, TCP stack options, and communication retries and graceful
+failover. While protocol buffers are a good design, and I think go a good job of
+solving binary serialization as its own problem (becoming reusable for file I/O
+as well as networks), I really wanted something that packaged serialization,
+cross-language support, and TCP communication all in one package from a single
+config file, so that a programmer needs only to write a single artifact (a
+`.nmspec` file), and get the code for their target programming language(s)
+generated automatically.
+
   [ruby-lang]: https://www.ruby-lang.org/
   [gdscript]: https://docs.godotengine.org/en/stable/getting_started/scripting/gdscript/gdscript_basics.html
   [generals.io]: https://generals.io/
+  [prolac]: https://pdos.csail.mit.edu/archive/prolac/prolac-the.pdf
+  [protobuffs]: https://developers.google.com/protocol-buffers
