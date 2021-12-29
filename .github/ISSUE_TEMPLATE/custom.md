@@ -31,4 +31,4 @@ _your requested language is more likely to be prioritized if we can identify peo
 _while support for multiple languages is a goal of nmspec, there are only so many hours in the day - help is very much appreciated_
 
 
-  [lang-support]: https://github.com/jefflunt/nmspec/issues?q=is%3Aopen+is%3Aissue+label%3Alang-support
+  [lang-support]: https://github.com/jefflunt/nmspec/issues?q=is%3Aany+is%3Aissue+label%3Alang-support+
