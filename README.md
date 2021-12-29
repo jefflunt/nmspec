@@ -83,10 +83,34 @@ A `messenger` is the thing you're descripting in an .nmspec file. A `messenger`
 has default support for reading and writing a number of numeric, string, and
 array types.
 
-## Types
+## Built-in types
 
-Custom-named types are a convenience feature that allows you to provide a more
-convenient name for a base type for your messaging protocols.
+The following built-in types are supported by `nmspec`
+
+```plaintext
+i8  u8  i8_list  u8_list    # signed/unsigned 8-bit ints, and lists of the same
+i16 u16 i16_list u16_list   # signed/unsigned 16-bit ints, and lists of the same
+i32 u32 i32_list u32_list   # signed/unsigned 32-bit ints, and lists of the same
+i64 u64 i64_list u64_list   # signed/unsigned 64-bit ints, and lists of the same
+float   float_list          # signed single-precision 32-bit floating point numbers, and a list of the same
+double  double_list         # signed double-precision 64-bit floating point numbers, and a list of the same
+str     str_list            # strings (arrays of bytes)
+```
+
+`*_list` types are ordered lists of elements (i.e. arrays).
+
+There is no support for mixed-type list, mostly because socket libraries seem to
+be centered around efficiently encoding/decoding streams of bytes with known bit
+widths. If you want to send multiple data types one after the other, place them
+into separate messages (see examples below).
+
+## Custom types
+
+Custom types are a way for you to give a more domain-relevant name to the
+built-in types. Custom types are not structs, nor are they similar to classes
+from object-oriented programming. You could, however, write your own structs or
+object classes to wrap the reading/writing of protocols, if you like, but that
+would be extra work that you would need to do in your own program code.
 
 A `Messenger` has many types.
 
