@@ -20,6 +20,11 @@ module Nmspec
         code << "class_name #{_class_name_from_msgr_name(spec.dig(:msgr, :name))}"
         code << ''
 
+        if (spec[:protos]&.length || 0) > 0
+          code << _opcode_mappings(spec[:protos])
+          code << ''
+        end
+
         code << '###########################################'
         code << '# setup'
         code << 'var socket = null'
@@ -57,6 +62,22 @@ module Nmspec
           .split(' ')
           .map{|part| part.capitalize}
           .join + 'Msgr'
+      end
+
+      def _opcode_mappings(protos)
+        code = []
+
+        code << 'const PROTO_TO_OP = {'
+        code += protos.map.with_index{|p, i| "\t'#{p[:name]}': #{i}," }
+        code << '}'
+
+        code << ''
+
+        code << 'const OP_TO_PROTO = {'
+        code += protos.map.with_index{|p, i| "\t#{i}: '#{p[:name]}'," }
+        code << '}'
+
+        code
       end
 
       def _init
@@ -227,8 +248,6 @@ module Nmspec
           # This figures out which identifiers mentioned in the msg
           # definition must be passed in vs. declared within the method
 
-          next unless proto.has_key?(:msgs) && !proto[:msgs].empty?
-
           code << ''
           send_local_vars = []
           recv_local_vars = []
@@ -296,8 +315,8 @@ module Nmspec
           msg = kind.eql?('send') ? msg : _flip_mode(msg)
           code << "\t#{_line_from_msg(msg, subtypes)}"
         end
-        code << ''
-        code << "\treturn [#{local_vars.map{|v| v.last }.uniq.join(', ')}]" unless local_vars.empty?
+
+        code << "\treturn [#{local_vars.map{|v| v.last }.uniq.join(', ')}]"
 
         code
       end

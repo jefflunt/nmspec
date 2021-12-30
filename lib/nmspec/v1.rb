@@ -122,7 +122,6 @@ module Nmspec
           protos = raw_spec['protos']
           protos&.each do |proto|
             errors << "invalid msg name `#{proto['name']}`" unless proto['name'] =~ IDENTIFIER_PATTERN
-            errors << "protocol `#{proto['name']}` has no msgs" if proto['msgs']&.empty?
             proto['msgs'] || [].each do |msg|
               mode, type, identifier = msg.split.map(&:strip)
               short_msg = [mode, type, identifier].join(' ')
@@ -148,6 +147,7 @@ module Nmspec
           warnings << 'msgr is missing a description' unless raw_spec['msgr'].is_a?(Hash) && raw_spec['msgr'].has_key?('desc')
 
           raw_spec['protos']&.each do |proto|
+            warnings << "protocol `#{proto['name']}` has no msgs" if proto['msgs']&.empty?
             warnings << "msg `#{proto['name']}` is missing a description" unless proto.has_key?('desc')
           end
         end

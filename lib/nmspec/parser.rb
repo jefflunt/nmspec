@@ -43,10 +43,11 @@ module Nmspec
 
           parsed[:protos] = []
           (spec_hash['protos'] || []).each do |proto|
+            msgs = (proto['msgs'] || [])
             parsed[:protos] << {
               name: proto['name'],
               desc: proto['desc'],
-              msgs: proto['msgs'].map do |msg|
+              msgs: msgs.map do |msg|
                 mode, type, identifier = msg.split
                 {
                   mode: case mode

@@ -18,6 +18,11 @@ module Nmspec
 
         code << "class #{_class_name_from_msgr_name(spec.dig(:msgr, :name))}"
 
+        if (spec[:protos]&.length || 0) > 0
+          code << _opcode_mappings(spec[:protos])
+          code << ''
+        end
+
         code << _initialize
         code << ''
         code << _close
@@ -45,6 +50,22 @@ module Nmspec
           .split(' ')
           .map{|part| part.capitalize}
           .join + 'Msgr'
+      end
+
+      def _opcode_mappings(protos)
+        code = []
+
+        code << '  PROTO_TO_OP = {'
+        code += protos.map.with_index{|p, i| "    '#{p[:name]}' => #{i}," }
+        code << '  }'
+
+        code << ''
+
+        code << '  OP_TO_PROTO = {'
+        code += protos.map.with_index{|p, i| "    #{i} => '#{p[:name]}'," }
+        code << '  }'
+
+        code
       end
 
       def _initialize
@@ -251,8 +272,6 @@ module Nmspec
           # This figures out which identifiers mentioned in the msg
           # definition must be passed in vs. declared within the method
 
-          next unless proto.has_key?(:msgs) && !proto[:msgs].empty?
-
           code << ''
           send_local_vars = []
           recv_local_vars = []
@@ -333,6 +352,7 @@ module Nmspec
           code << '  # ]'
         end
 
+        puts "Building proto method #{kind}_#{proto[:name]}"
         code << "  def #{kind}_#{proto[:name]}#{passed_params.length > 0 ? "(#{(passed_params.to_a).join(', ')})" : ''}"
 
         msgs = proto[:msgs]
@@ -341,7 +361,7 @@ module Nmspec
           msg = kind.eql?('send') ? msg : _flip_mode(msg)
           code << "    #{_line_from_msg(msg)}"
         end
-        code << "\n    [#{local_vars.map{|v| v.last }.uniq.join(', ')}]" unless local_vars.empty?
+        code << "    [#{local_vars.map{|v| v.last }.uniq.join(', ')}]"
         code << "  end"
 
         code
