@@ -17,12 +17,24 @@ module Nmspec
         code << ''
         code << 'extends Node'
         code << ''
+        code << "class_name #{_class_name_from_msgr_name(spec.dig(:msgr, :name))}"
+        code << ''
 
         code << '###########################################'
         code << '# setup'
         code << 'var socket = null'
         code << ''
         code << _init
+        code << ''
+        code << _process
+        code << ''
+        code << _connected
+        code << ''
+        code << _errored
+        code << ''
+        code << _ready_bytes
+        code << ''
+        code << _close
         code << ''
 
         code << _str_types
@@ -50,9 +62,71 @@ module Nmspec
       def _init
         code = []
 
-        code << 'func _init(_socket):'
+        code << '# initializes, and attempts to connect to the specified TCP host and port'
+        code << '#'
+        code << '# no_delay:'
+        code << "#   when set to 'true' the socket will disable Nagle's algorithm. The default"
+        code << "#   if 'false'"
+        code << 'func _init(_socket, _no_delay=false):'
         code << "\tsocket = _socket"
+        code << "\tsocket.set_no_delay(_no_delay)"
         code << "\tsocket.set_big_endian(true)"
+
+        code
+      end
+
+      def _close
+        code = []
+
+        code << '# calls .disconnect_from_host() on the underlying socket'
+        code << 'func _close():'
+        code << "\tsocket.disconnect_from_host()"
+      end
+
+      def _process
+        code = []
+
+        code << '# this method is only run until the socket either:'
+        code << '# - connects'
+        code << '# - errors'
+        code << '#'
+        code << '# when the socket reaches either state the _process method will be disabled'
+        code << 'func _process(delta):'
+        code << "\tmatch socket.get_status():"
+        code << "\t\t[StreamPeerTCP.STATUS_CONNECTED, StreamPeerTCP.STATUS_ERROR]:"
+        code << "\t\t\tset_process(false)"
+        code << "\t\t_:"
+        code << "\t\t\tpass"
+
+        code
+      end
+
+      def _connected
+        code = []
+
+        code << '# returns true if the messenger is connected, false otherwise'
+        code << 'func _connected():'
+        code << "\treturn socket != null && socket.get_status() == StreamPeerTCP.STATUS_CONNECTED"
+
+        code
+      end
+
+      def _errored
+        code = []
+
+        code << '# returns true if the messenger has errored, false otherwise'
+        code << 'func _errored():'
+        code << "\treturn socket != null && socket.get_status() == StreamPeerTCP.STATUS_ERROR"
+
+        code
+      end
+
+      def _ready_bytes
+        code = []
+
+        code << '# returns the number of bytes ready for reading'
+        code << 'func _ready_bytes():'
+        code << "\treturn socket.get_available_bytes()"
 
         code
       end
@@ -185,7 +259,6 @@ module Nmspec
           ##
           # send
           code << _proto_method('send', proto_code, proto, send_local_vars, send_passed_params, subtypes)
-          code << ''
           code << _proto_method('recv', proto_code, proto, recv_local_vars, recv_passed_params, subtypes)
         end
 

@@ -6,6 +6,8 @@ module Nmspec
     class << self
       def gen(spec)
         code = []
+        code << "require 'socket'"
+        code << ''
         code << '##'
         code << '# NOTE: this code is auto-generated from an nmspec file'
 
@@ -16,7 +18,9 @@ module Nmspec
 
         code << "class #{_class_name_from_msgr_name(spec.dig(:msgr, :name))}"
 
-        code << _constructor
+        code << _initialize
+        code << ''
+        code << _close
         code << ''
         code << _numeric_types
         code << _str_types
@@ -43,11 +47,26 @@ module Nmspec
           .join + 'Msgr'
       end
 
-      def _constructor
+      def _initialize
         code = []
-        code << '  def initialize(socket)'
+
+        code << '  def initialize(socket, no_delay=false)'
         code << '    @socket = socket'
+        code << '    @socket.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_NODELAY, 1) if no_delay'
         code << '  end'
+
+        code
+      end
+
+      def _close
+        code = []
+
+        code << '  ##'
+        code << '  # closes the socket inside this object'
+        code << '  def close'
+        code << '    @socket&.close'
+        code << '  end'
+
         code
       end
 
