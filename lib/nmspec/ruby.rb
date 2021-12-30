@@ -352,7 +352,6 @@ module Nmspec
           code << '  # ]'
         end
 
-        puts "Building proto method #{kind}_#{proto[:name]}"
         code << "  def #{kind}_#{proto[:name]}#{passed_params.length > 0 ? "(#{(passed_params.to_a).join(', ')})" : ''}"
 
         msgs = proto[:msgs]
