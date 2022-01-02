@@ -278,7 +278,7 @@ module Nmspec
 
           protos.each_with_index do |proto, proto_code|
             code << "\t\t#{proto_code}:"
-            code << "\t\t\t[#{proto_code}, recv_#{proto[:name]}()]"
+            code << "\t\t\treturn [#{proto_code}, recv_#{proto[:name]}()]"
           end
         end
 
