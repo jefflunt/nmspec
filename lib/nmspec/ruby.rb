@@ -323,17 +323,6 @@ module Nmspec
 
           code << '    end'
           code << '  end'
-
-          code << ''
-          code << '  def send_any(proto_code, params=[])'
-          code << '    case proto_code'
-
-          protos.each_with_index do |proto, proto_code|
-            code << "    when #{proto_code} then send_#{proto[:name]}(*params)"
-          end
-
-          code << '    end'
-          code << '  end'
         end
 
         code

@@ -269,6 +269,19 @@ module Nmspec
           code << _proto_method('recv', proto_code, proto, recv_local_vars, recv_passed_params, subtypes)
         end
 
+        if protos.length > 0
+          code << ''
+          code << "# This method is used when you're receiving protocol messages"
+          code << "# in an unknown order, and dispatching automatically."
+          code << "func recv_any():"
+          code << "\tmatch socket.get_u8():"
+
+          protos.each_with_index do |proto, proto_code|
+            code << "\t\t#{proto_code}:"
+            code << "\t\t\t[#{proto_code}, recv_#{proto[:name]}()]"
+          end
+        end
+
         code
       end
 
