@@ -10,8 +10,7 @@ protos:
   - name: all_base_types
     desc: write all base types
     msgs:
-      # LEGEND: `m` is either 'w' (write) or 'r' (read)
-      # m type        var name
+      # type        var name
       # ----------------------------------------------------
       - bool        bool
       - i8          i8

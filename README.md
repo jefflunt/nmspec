@@ -70,7 +70,8 @@ $ irb
      "errors"=>[],
      "warnings"=>[],
      "code"=> {
-       "ruby"=> "< a string of generated Ruby code that you can save to a file>"
+       "ruby"=> "< a string of generated Ruby code that you can save to a file>",
+       "gdscript"=> "< a string of generated GDSCript code that you can save to a file>",
      }
    }
 ```
@@ -88,6 +89,7 @@ array types.
 The following built-in types are supported by `nmspec`
 
 ```plaintext
+bool                        # boolean true/false
 i8  u8  i8_list  u8_list    # signed/unsigned 8-bit ints, and lists of the same
 i16 u16 i16_list u16_list   # signed/unsigned 16-bit ints, and lists of the same
 i32 u32 i32_list u32_list   # signed/unsigned 32-bit ints, and lists of the same
@@ -139,6 +141,13 @@ A minimal `messenger`, with only a name and default types supported must include
 * `msgr` - the top-level key for naming and describing the messenger
   * `name` - the name of the messenger
   * `desc` - a description of the messenger
+  * `bigendian` - (optional, defaults to `true`)
+    * if `true`, communication uses big-endian byte order
+    * if `false`, communication uses little-endian
+  * `nodelay` - (optional, defaults to `false`)
+    * if `true`, disables Nagle's algorithm, which prioritizes low-latency over
+      throughput efficiency
+    * if `false`, leaves Nagle's algorithm enabled
 
 ## Optional keys:
 
@@ -172,36 +181,38 @@ version: 1
 msgr:
   name: base types
   desc: this messenger supports the built-in types, and is mainly used for testing code generators
+  nodelay: true
+  bigendian: false
 
 protos:
   - name: all_base_types
     desc: write all base types
     msgs:
-      # LEGEND: `m` is either 'w' (write) or 'r' (read)
-      # m type        var name
+      # type        var name
       # ----------------------------------------------------
-      - w i8          i8
-      - w u8          u8
-      - w i8_list     i8_list
-      - w u8_list     u8_list
-      - w i16         i16
-      - w u16         u16
-      - w i16_list    i16_list
-      - w u16_list    u16_list
-      - w i32         i32
-      - w u32         u32
-      - w i32_list    i32_list
-      - w u32_list    u32_list
-      - w i64         i64
-      - w u64         u64
-      - w i64_list    i64_list
-      - w u64_list    u64_list
-      - w float       float
-      - w float_list  float_list
-      - w double      double
-      - w double_list double_list
-      - w str         str
-      - w str_list    str_list
+      - bool        bool
+      - i8          i8
+      - u8          u8
+      - i8_list     i8_list
+      - u8_list     u8_list
+      - i16         i16
+      - u16         u16
+      - i16_list    i16_list
+      - u16_list    u16_list
+      - i32         i32
+      - u32         u32
+      - i32_list    i32_list
+      - u32_list    u32_list
+      - i64         i64
+      - u64         u64
+      - i64_list    i64_list
+      - u64_list    u64_list
+      - float       float
+      - float_list  float_list
+      - double      double
+      - double_list double_list
+      - str         str
+      - str_list    str_list
 ```
 
 `demo/generals.io.nmspec` contains a theoretical implementation of a messenger
@@ -225,29 +236,29 @@ protos:
   - name: set_player_name
     desc: client message sets the player name for a given player
     msgs:
-      - w str player_name
+      - str player_name
   - name: resp_player_name
     desc: server message to accept or reject the player name
     msgs:
-      - w serv_code resp_code
-      - w serv_msg  resp_msg
+      - serv_code resp_code
+      - serv_msg  resp_msg
   - name: set_player_id
     desc: server message to client to set player id/color
     msgs:
-      - w player_id pid
+      - player_id pid
   - name: player_move
     desc: client message to server to make a player move
     msgs:
-      - w tile_id from
-      - w tile_id to
-      - w u16     armies
+      - tile_id from
+      - tile_id to
+      - u16     armies
   - name: set_tile
     desc: server message to client to set state of a tile
     msgs:
-      - w tile_id   tid
-      - w terrain   ttype # 0 = hidden, 1 = blank, 2 = mountains, 3 = fort, 4 = home base
-      - w player_id owner # 0 = no owner, 1 = player 1, 2 = player, etc.
-      - w u16       armies
+      - tile_id   tid
+      - terrain   ttype # 0 = hidden, 1 = blank, 2 = mountains, 3 = fort, 4 = home base
+      - player_id owner # 0 = no owner, 1 = player 1, 2 = player, etc.
+      - u16       armies
 ```
 
 ## How code is generated
@@ -275,7 +286,7 @@ the closest thing to what I wanted, and took care of binary
 serialization/deserialization, but weren't packaaged with the networking layer,
 which introduces additional considerations such as byte ordering, efficient
 packet construction, TCP stack options, and communication retries and graceful
-failover. While protocol buffers are a good design, and I think go a good job of
+failover. While protocol buffers are a good design, and I think do a good job of
 solving binary serialization as its own problem (becoming reusable for file I/O
 as well as networks), I really wanted something that packaged serialization,
 cross-language support, and TCP communication all in one package from a single
