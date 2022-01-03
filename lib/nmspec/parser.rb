@@ -48,14 +48,9 @@ module Nmspec
               name: proto['name'],
               desc: proto['desc'],
               msgs: msgs.map do |msg|
-                mode, type, identifier = msg.split
+                type, identifier = msg.split
                 {
-                  mode: case mode
-                        when 'r' then :read
-                        when 'w' then :write
-                        else
-                          raise "Unknown msg mode: `#{mode}`"
-                        end,
+                  mode: :write,
                   type: type,
                   identifier: identifier,
                 }

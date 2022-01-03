@@ -15,26 +15,26 @@ protos:
   - name: set_player_name
     desc: client message sets the player name for a given player
     msgs:
-      - w str player_name
+      - str player_name
   - name: resp_player_name
     desc: server message to accept or reject the player name
     msgs:
-      - w serv_code resp_code
-      - w serv_msg  resp_msg
+      - serv_code resp_code
+      - serv_msg  resp_msg
   - name: set_player_id
     desc: server message to client to set player id/color
     msgs:
-      - w player_id pid
+      - player_id pid
   - name: player_move
     desc: client message to server to make a player move
     msgs:
-      - w tile_id from
-      - w tile_id to
-      - w u16     armies
+      - tile_id from
+      - tile_id to
+      - u16     armies
   - name: set_tile
     desc: server message to client to set state of a tile
     msgs:
-      - w tile_id   tid
-      - w terrain   ttype # 0 = hidden, 1 = blank, 2 = mountains, 3 = fort, 4 = home base
-      - w player_id owner # 0 = no owner, 1 = player 1, 2 = player, etc.
-      - w u16       armies
+      - tile_id   tid
+      - terrain   ttype # 0 = hidden, 1 = blank, 2 = mountains, 3 = fort, 4 = home base
+      - player_id owner # 0 = no owner, 1 = player 1, 2 = player, etc.
+      - u16       armies
