@@ -14,6 +14,8 @@ class TestParser < Minitest::Test
         msgr: {
           name: 'minimal',
           desc: 'this messenger only supports the built-in types, and has no custom protocols',
+          nodelay: false,
+          bigendian: true,
         },
         types: [
           {
@@ -139,7 +141,9 @@ class TestParser < Minitest::Test
         version: 1,
         msgr: {
           name: 'base types',
-          desc: 'this messenger supports the built-in types, and is mainly used for testing code generators'
+          desc: 'this messenger supports the built-in types, and is mainly used for testing code generators',
+          nodelay: true,
+          bigendian: false,
         },
         types: [
           {
@@ -382,7 +386,9 @@ class TestParser < Minitest::Test
         version: 1,
         msgr: {
           name: 'generals.io',
-          desc: 'demo nmspec file for generals.io'
+          desc: 'demo nmspec file for generals.io',
+          nodelay: false,
+          bigendian: true,
         },
         types: [
           {

@@ -5,6 +5,8 @@ module Nmspec
   module Ruby
     class << self
       def gen(spec)
+        endian_marker = spec.dig(:msgr, :bigendian) ? '>' : '<'
+
         code = []
         code << "require 'socket'"
         code << ''
@@ -27,9 +29,9 @@ module Nmspec
         code << ''
         code << _close
         code << ''
-        code << _numeric_types
-        code << _str_types
-        code << _list_types
+        code << _numeric_types(endian_marker)
+        code << _str_types(endian_marker)
+        code << _list_types(endian_marker)
 
         types = spec[:types]
         code << _subtype_aliases(types)
@@ -110,7 +112,7 @@ module Nmspec
 
       ##
       # inserts the boilerplate base type readers and writers
-      def _numeric_types
+      def _numeric_types(endian_marker)
         code = []
 
         code << '  ###########################################'
@@ -123,17 +125,17 @@ module Nmspec
             # See https://www.rubydoc.info/stdlib/core/1.9.3/Array:pack
             num_bytes, pack_type =  case type
                                     when 'float'
-                                      [4, 'g']
+                                      [4, endian_marker.eql?('>') ? 'g' : 'e']
                                     when 'double'
-                                      [8, 'G']
+                                      [8, endian_marker.eql?('>') ? 'G' : 'E']
                                     when 'i8','u8'
                                       [1, type.start_with?('i') ? 'c' : 'C']
                                     when 'i16','u16'
-                                      [2, type.start_with?('i') ? 's>' : 'S>']
+                                      [2, type.start_with?('i') ? "s#{endian_marker}" : "S#{endian_marker}"]
                                     when 'i32','u32'
-                                      [4, type.start_with?('i') ? 'l>' : 'L>']
+                                      [4, type.start_with?('i') ? "l#{endian_marker}" : "L#{endian_marker}"]
                                     when 'i64','u64'
-                                      [8, type.start_with?('i') ? 'q>' : 'Q>']
+                                      [8, type.start_with?('i') ? "q#{endian_marker}" : "Q#{endian_marker}"]
                                     else
                                       next
                                     end
@@ -162,7 +164,7 @@ module Nmspec
         code
       end
 
-      def _str_types
+      def _str_types(endian_marker)
         code = []
 
         code << '  ###########################################'
@@ -170,20 +172,20 @@ module Nmspec
         code << '  ###########################################'
         code << ''
         code << "  def r_str"
-        code << "    bytes = @socket.recv(4).unpack('L>').first"
+        code << "    bytes = @socket.recv(4).unpack('L#{endian_marker}').first"
         code << "    @socket.recv(bytes)"
         code << '  end'
         code << ''
         code << "  def w_str(str)"
-        code << "    @socket.send([str.length].pack('L>'), 0)"
+        code << "    @socket.send([str.length].pack('L#{endian_marker}'), 0)"
         code << "    @socket.send(str, 0)"
         code << '  end'
         code << ''
         code << "  def r_str_list"
         code << '    strings = []'
         code << ''
-        code << "    @socket.recv(4).unpack('L>').first.times do"
-        code << "      str_length = @socket.recv(4).unpack('L>').first"
+        code << "    @socket.recv(4).unpack('L#{endian_marker}').first.times do"
+        code << "      str_length = @socket.recv(4).unpack('L#{endian_marker}').first"
         code << "      strings << @socket.recv(str_length)"
         code << '    end'
         code << ''
@@ -191,9 +193,9 @@ module Nmspec
         code << '  end'
         code << ''
         code << "  def w_str_list(str_list)"
-        code << "    @socket.send([str_list.length].pack('L>'), 0)"
+        code << "    @socket.send([str_list.length].pack('L#{endian_marker}'), 0)"
         code << '    str_list.each do |str|'
-        code << "      @socket.send([str.length].pack('L>'), 0)"
+        code << "      @socket.send([str.length].pack('L#{endian_marker}'), 0)"
         code << "      @socket.send(str, 0)"
         code << '    end'
         code << '  end'
@@ -203,7 +205,7 @@ module Nmspec
       end
 
       # This includes str, and anything with '*_list' in the type name
-      def _list_types
+      def _list_types(endian_marker)
         code = []
 
         code << '  ###########################################'
@@ -216,40 +218,40 @@ module Nmspec
             # See https://www.rubydoc.info/stdlib/core/1.9.3/Array:pack
             num_bytes, pack_type =  case type
                                     when 'float_list'
-                                      [4, 'g']
+                                      [4, endian_marker.eql?('>') ? 'g' : 'e']
                                     when 'double_list'
-                                      [8, 'G']
+                                      [8, endian_marker.eql?('>') ? 'G' : 'E']
                                     when 'i8_list','u8_list'
                                       [1, type.start_with?('i') ? 'c' : 'C']
                                     when 'i16_list','u16_list'
-                                      [2, type.start_with?('i') ? 's>' : 'S>']
+                                      [2, type.start_with?('i') ? "s#{endian_marker}" : "S#{endian_marker}"]
                                     when 'i32_list','u32_list'
-                                      [4, type.start_with?('i') ? 'l>' : 'L>']
+                                      [4, type.start_with?('i') ? "l#{endian_marker}" : "L#{endian_marker}"]
                                     when 'i64_list','u64_list'
-                                      [8, type.start_with?('i') ? 'q>' : 'Q>']
+                                      [8, type.start_with?('i') ? "q#{endian_marker}" : "Q#{endian_marker}"]
                                     else
                                       next
                                     end
 
-            code << _type_list_reader_writer_methods(type, num_bytes, pack_type)
+            code << _type_list_reader_writer_methods(type, num_bytes, endian_marker, pack_type)
           end
 
         code
       end
 
-      def _type_list_reader_writer_methods(type, num_bytes, pack_type=nil)
+      def _type_list_reader_writer_methods(type, num_bytes, endian_marker, pack_type=nil)
         code = []
 
         send_contents = pack_type ?  "(#{type}.pack('#{pack_type}*'), 0)" : "(#{type}, 0)"
         recv_contents = pack_type ? "(#{num_bytes} * #{type}.length).unpack('#{pack_type}*')" : "(#{num_bytes})"
 
         code << "  def r_#{type}"
-        code << "    list_len = @socket.recv(4).unpack('L>').first"
+        code << "    list_len = @socket.recv(4).unpack('L#{endian_marker}').first"
         code << "    @socket.recv(list_len * #{num_bytes}).unpack('#{pack_type}*')"
         code << '  end'
         code << ''
         code << "  def w_#{type}(#{type})"
-        code << "    @socket.send([#{type}.length].pack('L>'), 0)"
+        code << "    @socket.send([#{type}.length].pack('L#{endian_marker}'), 0)"
         code << "    @socket.send(#{type}.pack('#{pack_type}*'), 0)"
         code << '  end'
         code << ''

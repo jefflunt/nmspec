@@ -3,6 +3,8 @@ version: 1
 msgr:
   name: base types
   desc: this messenger supports the built-in types, and is mainly used for testing code generators
+  nodelay: true
+  bigendian: false
 
 protos:
   - name: all_base_types

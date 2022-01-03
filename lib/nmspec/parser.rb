@@ -21,6 +21,8 @@ module Nmspec
           parsed[:msgr] = {
             name: spec_hash.dig('msgr', 'name'),
             desc: spec_hash.dig('msgr', 'desc'),
+            nodelay: spec_hash.dig('msgr', 'nodelay') || false,
+            bigendian: spec_hash.dig('msgr', 'bigendian').nil? ? true : spec_hash.dig('msgr', 'bigendian')
           }
 
           parsed[:types] = []

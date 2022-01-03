@@ -5,6 +5,9 @@ module Nmspec
   module GDScript
     class << self
       def gen(spec)
+        big_endian = spec.dig(:msgr, :bigendian)
+        nodelay = spec.dig(:msgr, :nodelay)
+
         code = []
         code << '##'
         code << '# NOTE: this code is auto-generated from an nmspec file'
@@ -28,7 +31,7 @@ module Nmspec
         code << '# setup'
         code << 'var socket = null'
         code << ''
-        code << _init
+        code << _init(big_endian, nodelay)
         code << ''
         code << _connected
         code << ''
@@ -79,15 +82,15 @@ module Nmspec
         code
       end
 
-      def _init
+      def _init(big_endian, nodelay)
         code = []
 
         code << '# WARN: Messengers in GDScript assume big_endian byte order'
         code << '# WARN: this means sockets that use little-endian will tend to lock up'
         code << 'func _init(_socket):'
         code << "\tsocket = _socket"
-        code << "\tsocket.set_big_endian(true)"
-        code << "\tsocket.set_no_delay(false)"
+        code << "\tsocket.set_no_delay(#{nodelay})"
+        code << "\tsocket.set_big_endian(#{big_endian})"
 
         code
       end
