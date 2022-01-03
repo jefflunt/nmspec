@@ -17,7 +17,8 @@ class TestBaseTypes < Minitest::Test
         client = tcp_server.accept
         msgr = BaseTypesMsgr.new(client)
         proto_code, recv_data = msgr.recv_any
-        msgr.send_any(proto_code, recv_data)
+
+        msgr.send("send_#{BaseTypesMsgr::OP_TO_PROTO[proto_code]}", *recv_data)
       end
     }
 
