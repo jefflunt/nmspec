@@ -44,6 +44,8 @@ module Nmspec
         code << _close
         code << ''
 
+        code << _bool_type
+        code << ''
         code << _str_types
         code << ''
         code << _list_types
@@ -139,6 +141,24 @@ module Nmspec
         code << '# returns the number of bytes ready for reading'
         code << 'func _ready_bytes():'
         code << "\treturn socket.get_available_bytes()"
+
+        code
+      end
+
+      def _bool_type
+        code = []
+
+        code << '###########################################'
+        code << '# boolean type'
+        code << "func r_bool():"
+        code << "\treturn socket.get_8() == 1"
+        code << ""
+        code << "func w_bool(bool_var):"
+        code << "\tmatch bool_var:"
+        code << "\t\ttrue:"
+        code << "\t\t\tsocket.put_u8(1)"
+        code << "\t\t_:"
+        code << "\t\t\tsocket.put_u8(0)"
 
         code
       end
@@ -293,6 +313,7 @@ module Nmspec
         when 'float' then 'flt'
         when 'str'   then 'string'
         when 'floor' then 'flr'
+        when 'bool'  then 'bool_var'
         else
           word
         end
@@ -346,6 +367,8 @@ module Nmspec
             "var #{identifier} = r_#{type}()"
           when type.eql?('string')
             "var #{identifier} = r_str()"
+          when type.eql?('bool')
+            "var #{identifier} = r_bool()"
           else
             "var #{identifier} = socket.get_#{type}()"
           end
@@ -355,6 +378,8 @@ module Nmspec
             "w_#{type}(#{identifier})"
           when type.eql?('string')
             "w_str(#{identifier})"
+          when type.eql?('bool')
+            "w_bool(#{identifier})"
           else
             "socket.put_#{type}(#{identifier})"
           end

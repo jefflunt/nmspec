@@ -19,6 +19,11 @@ class TestParser < Minitest::Test
         },
         types: [
           {
+            name: 'bool',
+            base_type: nil,
+            kind: 'bool',
+          },
+          {
             name: 'i8',
             base_type: nil,
             kind: 'numeric',
@@ -147,6 +152,11 @@ class TestParser < Minitest::Test
         },
         types: [
           {
+            name: 'bool',
+            base_type: nil,
+            kind: 'bool',
+          },
+          {
             name: 'i8',
             base_type: nil,
             kind: 'numeric',
@@ -262,6 +272,11 @@ class TestParser < Minitest::Test
             name: 'all_base_types',
             desc: 'write all base types',
             msgs: [
+              {
+                mode: :write,
+                type: 'bool',
+                identifier: 'bool',
+              },
               {
                 mode: :write,
                 type: 'i8',
@@ -391,6 +406,11 @@ class TestParser < Minitest::Test
           bigendian: true,
         },
         types: [
+          {
+            name: 'bool',
+            base_type: nil,
+            kind: 'bool',
+          },
           {
             name: 'i8',
             base_type: nil,

@@ -13,6 +13,7 @@ protos:
       # LEGEND: `m` is either 'w' (write) or 'r' (read)
       # m type        var name
       # ----------------------------------------------------
+      - bool        bool
       - i8          i8
       - u8          u8
       - i8_list     i8_list

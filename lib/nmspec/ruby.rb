@@ -29,6 +29,8 @@ module Nmspec
         code << ''
         code << _close
         code << ''
+        code << _bool_type
+        code << ''
         code << _numeric_types(endian_marker)
         code << _str_types(endian_marker)
         code << _list_types(endian_marker)
@@ -106,6 +108,26 @@ module Nmspec
           code << "  alias_method :r_#{type_hash[:name]}, :r_#{type_hash[:base_type]}"
           code << "  alias_method :w_#{type_hash[:name]}, :w_#{type_hash[:base_type]}"
         end
+
+        code
+      end
+
+      ##
+      # inserts the boolean type readers and writers
+      def _bool_type
+        code = []
+
+        code << '  ###########################################'
+        code << '  # boolean type'
+        code << '  ###########################################'
+        code << ''
+        code << "  def r_bool"
+        code << "    @socket.recv(1).unpack('C')[0] == 1"
+        code << '  end'
+        code << ''
+        code << "  def w_bool(bool)"
+        code << "    @socket.send([bool ? 1 : 0].pack('C'), 0)"
+        code << '  end'
 
         code
       end

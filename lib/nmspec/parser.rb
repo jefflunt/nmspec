@@ -4,6 +4,7 @@ module Nmspec
   module Parser
     class << self
       BASE_TYPES = %w(
+                      bool
                       i8 u8   i8_list  u8_list
                       i16 u16 i16_list u16_list
                       i32 u32 i32_list u32_list
@@ -64,6 +65,8 @@ module Nmspec
 
       def _kind_of(type)
         case type
+        when 'bool'
+          'bool'
         when /\A(float|double|[ui]\d{1,2})\Z/
           'numeric'
         when /\A(float|double|[ui]\d{1,2})_list\Z/

@@ -46,6 +46,7 @@ class TestBaseTypes < Minitest::Test
 
   def test_send_all_base_types
     send_data = [
+      true,
       -1,
       255,
       [-1, -2, -3],
