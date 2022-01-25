@@ -6,8 +6,11 @@ Gem::Specification.new do |s|
   s.summary     = "nmspec is a network message specification language for network peers"
   s.description = "nmspec makes it easier to describe binary messages between two network peers via a config file, generate their network code in a number of languages, and keep their code in sync"
   s.authors     = ["Jeff Lunt"]
-  s.email       = 'jefflunt@gmail.com'
-  s.files       = ["lib/nmspec.rb"]
+  s.email       = ['jefflunt@gmail.com']
+
+  s.require_path  = 'lib'
+  s.files         = Dir["{lib}/**/*.rb", "LICENSE", "*.md"]
+
   s.homepage    = 'http://nmspec.com'
   s.license     = 'MIT'
   s.metadata    = { "source_code_uri" => "https://github.com/jefflunt/nmspec" }
