@@ -91,7 +91,6 @@ module Nmspec
         code << '# WARN: this means sockets that use little-endian will tend to lock up'
         code << 'func _init(_socket):'
         code << "\tsocket = _socket"
-        code << "\tsocket.set_no_delay(#{nodelay})"
         code << "\tsocket.set_big_endian(#{big_endian})"
 
         code
