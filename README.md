@@ -48,8 +48,8 @@ As a starting point this gem supports network messengers in these two languages:
 * [Ruby 3.0.x][ruby-lang]
 * [GDScript 3.4.stable][gdscript]
 
-`nmspec` came out of a online game project where the backend was written in
-Ruby, and the frontend build with the Godot game engine, which includes the
+`nmspec` came out of a online game project where the backend is written in
+Ruby, and the frontend is built with the Godot game engine, which includes the
 embedded scripting language, GDSCript.
 
 # Sample usage
