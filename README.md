@@ -283,7 +283,7 @@ description languages/tools in the past, beginning with [Prolac][prolac]. This
 lead me to other network messaging tools, binary serialization in general,
 finally [Google's protocol buffers][protobuffs]. Protocol buffers were probably
 the closest thing to what I wanted, and took care of binary
-serialization/deserialization, but weren't packaaged with the networking layer,
+serialization/deserialization, but weren't packaged with the networking layer,
 which introduces additional considerations such as byte ordering, efficient
 packet construction, TCP stack options, and communication retries and graceful
 failover. While protocol buffers are a good design, and I think do a good job of
