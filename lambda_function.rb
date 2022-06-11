@@ -1,5 +1,9 @@
 require 'json'
-load './lib/nmspec.rb'
+
+require_relative './lib/nmspec/v1'
+require_relative './lib/nmspec/parser'
+require_relative './lib/nmspec/ruby'
+require_relative './lib/nmspec/gdscript.rb'
 
 def lambda_handler(event:, context:)
 
@@ -40,3 +44,4 @@ rescue => e
     ),
   }
 end
+
