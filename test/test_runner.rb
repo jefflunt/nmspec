@@ -1,6 +1,6 @@
 require 'minitest'
 require 'yaml'
-require_relative '../lib/nmspec'
+Dir['lib/nmspec.rb'].each{|f| load f }
 Dir['test/**/*_test.rb'].each{|f| load f }
 
 def nmspec_parse_and_load_demo(kind)

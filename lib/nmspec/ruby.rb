@@ -27,6 +27,8 @@ module Nmspec
 
         code << _initialize
         code << ''
+        code << _open?
+        code << ''
         code << _close
         code << ''
         code << _bool_type
@@ -77,7 +79,20 @@ module Nmspec
 
         code << '  def initialize(socket, no_delay=false)'
         code << '    @socket = socket'
+        code << '    @open = true'
         code << '    @socket.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_NODELAY, 1) if no_delay'
+        code << '  end'
+
+        code
+      end
+
+      def _open?
+        code = []
+
+        code << '  ##'
+        code << '  # closes the socket inside this object'
+        code << '  def open?'
+        code << '    !!(@socket && @open)'
         code << '  end'
 
         code
@@ -89,6 +104,7 @@ module Nmspec
         code << '  ##'
         code << '  # closes the socket inside this object'
         code << '  def close'
+        code << '    @open = false'
         code << '    @socket&.close'
         code << '  end'
 
