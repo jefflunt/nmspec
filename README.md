@@ -5,16 +5,18 @@ serialization and network communication (two things that are usually treated
 separately), designed to make creating TCP protocols between two ends of a
 network connection easier to specify and keep consistent..
 
-<a href="https://youtu.be/Ib6c6BEl82c">
-  <img src="https://s3.us-east-2.amazonaws.com/vim4evar.com/nmspec-imgs/link-to-demo-video.png" />
-</a>
-
 A centralized YAML file is used to describe the types and messages passed
 between network peers, and from that description TCP peer code (a "messenger")
 is generated in any supported output programming language. The messages
 described in `nmspec` are used to create both the reading and writing sides
 of the connection, so that a single source code file contains everything you
 need for a network peer, regardless of if it's the client or server.
+
+## Demo video explaining how to use this gem
+
+<a href="https://youtu.be/Ib6c6BEl82c">
+  <img src="https://s3.us-east-2.amazonaws.com/vim4evar.com/nmspec-imgs/link-to-demo-video.png" />
+</a>
 
 ## Motivation
 
