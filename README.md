@@ -5,7 +5,9 @@ serialization and network communication (two things that are usually treated
 separately), designed to make creating TCP protocols between two ends of a
 network connection easier to specify and keep consistent..
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/Ib6c6BEl82c" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<a href="https://youtu.be/Ib6c6BEl82c">
+  <img src="https://s3.us-east-2.amazonaws.com/vim4evar.com/nmspec-imgs/link-to-demo-video.png" />
+</a>
 
 A centralized YAML file is used to describe the types and messages passed
 between network peers, and from that description TCP peer code (a "messenger")
