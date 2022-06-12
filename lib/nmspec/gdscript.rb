@@ -52,8 +52,6 @@ module Nmspec
 
         subtypes = spec[:types].select{|t| !t[:base_type].nil? }
         code << _protos_methods(spec[:protos], subtypes)
-
-        code.join("\n")
       rescue => e
         "Code generation failed due to unknown error: check spec validity\n  cause: #{e.inspect}"
         puts e.backtrace.join("\n  ")
@@ -288,6 +286,7 @@ module Nmspec
           ##
           # send
           code << _proto_method('send', proto_code, proto, send_local_vars, send_passed_params, subtypes)
+          code << "\n"
           code << _proto_method('recv', proto_code, proto, recv_local_vars, recv_passed_params, subtypes)
         end
 
