@@ -14,7 +14,7 @@ module Nmspec
 
         if spec.dig(:msgr, :desc)
           code << '#'
-          code << "# #{spec.dig(:msgr, :desc)}"
+          spec.dig(:msgr, :desc).lines.each{|l| code << "# #{l.strip}" }
         end
 
         code << 'extends Reference'
@@ -323,7 +323,7 @@ module Nmspec
       def _proto_method(kind, proto_code, proto, local_vars, passed_params, subtypes)
         code = []
 
-        code << "# #{proto[:desc]}" if proto[:desc]
+        proto[:desc].lines.each{|l| code << "# #{l.strip}" } if proto[:desc]
         unless local_vars.empty?
           code << '#'
           code << '# returns:  (type | local var name)'

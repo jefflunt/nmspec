@@ -14,8 +14,8 @@ module Nmspec
         code << '# NOTE: this code is auto-generated from an nmspec file'
 
         if spec.dig(:msgr, :desc)
-          code << '#'
-          code << "# #{spec.dig(:msgr, :desc)}"
+          code << '##'
+          spec.dig(:msgr, :desc).lines.each{|l| code << "# #{l.strip}" }
         end
 
         code << "class #{_class_name_from_msgr_name(spec.dig(:msgr, :name))}"
@@ -372,7 +372,8 @@ module Nmspec
       def _proto_method(kind, proto_code, proto, local_vars, passed_params)
         code = []
 
-        code << "  # #{proto[:desc]}" if proto[:desc]
+        proto[:desc].lines.each{|l| code << "  # #{l.strip}" } if proto[:desc]
+
         unless local_vars.empty?
           code << '  #'
           code << '  # returns:  (type | local var name)'
