@@ -1,0 +1,32 @@
+<!doctype html>
+<html>
+  <head>
+    <title>nmspec online generator</title>
+    <meta charset="utf-8">
+    <meta name="description" content="nmspec.com is the free online generator tool for nmsepc files">
+    <meta property="og:title" content="the nmspec generator">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://nmspec.com">
+    <meta property="og:description" content="nmspec.com is the free online generator tool for nmsepc files">
+    <meta name="robots" content="index">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link rel="canonical" href="https://nmspec.com/"/>
+    <script src="codemirror.js"></script>
+    <script src="yaml.js"></script>
+  </head>
+  <body>
+    <link rel="stylesheet" href="codemirror.css">
+    <link rel="stylesheet" href="theme/material-ocean.css">
+    <script>
+      var codeEditor = CodeMirror(document.body, {
+        value: "# the minimal nmspec file\nversion: 1\n\nmsgr:\n  name: minimal\n  desc: the absolute minimum required to build an nmspec messenger",
+        mode:  "text/x-yaml",
+        theme: "material-ocean",
+        lineNumbers: true,
+        indentUnit: 2,
+        tabSize: 2,
+        indentWithTabs: false,
+      });
+    </script>
+  </body>
+</html>
