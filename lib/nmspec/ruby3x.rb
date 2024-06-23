@@ -2,7 +2,7 @@ require 'set'
 
 # Nmspec code generator for ruby
 module Nmspec
-  module Ruby
+  module Ruby3x
     class << self
       def gen(spec)
         endian_marker = spec.dig(:msgr, :bigendian) ? '>' : '<'

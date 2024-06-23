@@ -2,7 +2,7 @@ require 'set'
 
 # Nmspec code generator for ruby
 module Nmspec
-  module GDScript
+  module GDScript3x
     class << self
       def gen(spec)
         big_endian = spec.dig(:msgr, :bigendian)

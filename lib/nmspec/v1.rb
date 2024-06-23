@@ -4,7 +4,7 @@ require_relative './version.rb'
 module Nmspec
   module V1
     SUPPORTED_SPEC_VERSIONS = [1]
-    SUPPORTED_OUTPUT_LANGS = %w(gdscript ruby)
+    SUPPORTED_OUTPUT_LANGS = %w(gdscript3x ruby3x)
     GEN_OPTS_KEYS = %w(langs spec)
     REQ_KEYS = %w(version msgr)
     OPT_KEYS = %w(types protos)
@@ -27,7 +27,7 @@ module Nmspec
       #
       # {
       #   'spec' => <String of valid nmspec YAML,
-      #   'langs' => ['ruby', ...],   # array of target languages
+      #   'langs' => ['ruby3x', ...],   # array of target languages
       # }
       #
       # Returns a hash with this format:
@@ -157,14 +157,14 @@ module Nmspec
         errors(raw_spec).empty?
       end
 
-      def to_ruby(spec_hash)
-        ::Nmspec::Ruby.gen(spec_hash)
+      def to_ruby3x(spec_hash)
+        ::Nmspec::Ruby3x.gen(spec_hash)
       rescue
         'codegen failure'
       end
 
-      def to_gdscript(spec_hash)
-        ::Nmspec::GDScript.gen(spec_hash)
+      def to_gdscript3x(spec_hash)
+        ::Nmspec::GDScript3x.gen(spec_hash)
       rescue
         'codegen failure'
       end

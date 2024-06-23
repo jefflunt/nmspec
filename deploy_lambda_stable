@@ -1,3 +1,0 @@
-# /bin/sh
-
-aws lambda update-function-code --function-name nmspec_stable --zip-file fileb://nmspec_lambda.zip

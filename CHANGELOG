@@ -1,3 +1,8 @@
+-- 1.7.0 / 2024-06.24
+ * remove AWS lambda deploy
+ * rename Ruby generator to Ruby3x
+ * rename GDScript generator to GDScript3x
+
 == 1.6.0 / 2022-06-11
  * added `#open?` method to Ruby code generator to provide messenger socket status
  * fixed load paths for lambda function, specifically
