@@ -124,6 +124,7 @@ module Nmspec
           code << "  alias_method :r_#{type_hash[:name]}, :r_#{type_hash[:base_type]}"
           code << "  alias_method :w_#{type_hash[:name]}, :w_#{type_hash[:base_type]}"
         end
+        code << ''
 
         code
       end
