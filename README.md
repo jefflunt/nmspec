@@ -1,9 +1,9 @@
 # `nmspec`
 
 `nmspec` (network message specification) is a combination of binary
-serialization and network communication (two things that are usually treated
-separately), designed to make creating TCP protocols between two ends of a
-network connection easier to specify and keep consistent..
+serialization and network communication (basically [rpc][rpc]), designed to
+make creating TCP protocols between two ends of a network connection easier to
+specify and keep consistent..
 
 A centralized YAML file is used to describe the types and messages passed
 between network peers, and from that description TCP peer code (a "messenger")
@@ -45,8 +45,8 @@ purpose.
 
 As a starting point this gem supports network messengers in these two languages:
 
-* [Ruby 3.0.x][ruby-lang]
-* [GDScript 3.4.stable][gdscript]
+* [Ruby 3.x][ruby-lang]
+* [GDScript 3.x.stable][gdscript]
 
 `nmspec` came out of a online game project where the backend is written in
 Ruby, and the frontend is built with the Godot game engine, which includes the
