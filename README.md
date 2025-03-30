@@ -12,12 +12,6 @@ described in `nmspec` are used to create both the reading and writing sides
 of the connection, so that a single source code file contains everything you
 need for a network peer, regardless of if it's the client or server.
 
-## Demo video explaining how to use this gem
-
-<a href="https://youtu.be/Ib6c6BEl82c">
-  <img src="https://s3.us-east-2.amazonaws.com/vim4evar.com/nmspec-imgs/link-to-demo-video.png" />
-</a>
-
 ## Motivation
 
 `nmspec` was specifically created to help with with a problem I was facing,
