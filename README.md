@@ -278,6 +278,9 @@ Output program code is generated in the following manner:
 
 ## Preliminary research, and comparison to other methods
 
+`nmspec` is basically [rpc][rpc], except it also bundles code generators, and
+not just the rpc message/protocol specifications.
+
 I started with researching how other people had designed network protocol
 description languages/tools in the past, beginning with [Prolac][prolac]. This
 lead me to other network messaging tools, binary serialization in general,
@@ -294,6 +297,7 @@ config file, so that a programmer needs only to write a single artifact (a
 `.nmspec` file), and get the code for their target programming language(s)
 generated automatically.
 
+  [rpc]: https://en.wikipedia.org/wiki/Remote_procedure_call
   [ruby-lang]: https://www.ruby-lang.org/
   [gdscript]: https://docs.godotengine.org/en/stable/getting_started/scripting/gdscript/gdscript_basics.html
   [generals.io]: https://generals.io/
